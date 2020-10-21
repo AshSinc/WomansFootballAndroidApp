@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">WomensFootball</string>
+    <string name="res_league">League</string>
+    <string name="res_preferences">Preferences</string>
+    <string name="res_refresh">Force Refresh</string>
+    <string name="res_fixtures">Fixtures</string>
+    <string name="res_events">Events</string>
 </resources>

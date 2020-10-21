@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/mi_Preferences"
+        android:title="@string/res_preferences" />
+    <item
+        android:id="@+id/mi_ForceRefresh"
+        android:title="@string/res_refresh" />
+</menu>
