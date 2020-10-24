@@ -5,4 +5,14 @@
     <string name="res_refresh">Force Refresh</string>
     <string name="res_fixtures">Fixtures</string>
     <string name="res_events">Events</string>
+    <string name="res_teamIconDescription"/>
+    <string name="res_clubLabel">Club</string>
+    <string name="res_playedLabel">P</string>
+    <string name="res_winLabel">W</string>
+    <string name="res_drwLabel">D</string>
+    <string name="res_lossLabel">L</string>
+    <string name="res_diffLabel">GD</string>
+    <string name="res_pointsLabel">Pts</string>
+    <string name="res_posLabel">Pos</string>
+    <string name="res_dash">-</string>
 </resources>

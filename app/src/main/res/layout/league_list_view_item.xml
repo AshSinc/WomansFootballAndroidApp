@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/gl_6p"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.06" />
+
+    <TextView
+        android:id="@+id/tv_pos"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:gravity="center"
+        app:layout_constraintStart_toStartOf="@+id/gl_6p"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_percent="0.05" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/gl_14p"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.14" />
+
+    <TextView
+        android:id="@+id/tv_TeamName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="@string/res_clubLabel"
+        app:layout_constraintBottom_toBottomOf="@+id/tv_pos"
+        app:layout_constraintStart_toStartOf="@+id/gl_14p"
+        app:layout_constraintTop_toTopOf="@+id/tv_pos"
+        app:layout_constraintVertical_bias="1.0"
+        app:layout_constraintWidth_percent="0.2" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/gl_36p"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.36" />
+
+    <ImageView
+        android:id="@+id/iv_TeamBadge"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:background="@android:drawable/btn_star_big_on"
+        android:contentDescription="@string/res_teamIconDescription"
+        app:layout_constraintBottom_toBottomOf="@+id/tv_TeamName"
+        app:layout_constraintStart_toStartOf="@+id/gl_36p"
+        app:layout_constraintTop_toTopOf="@+id/tv_TeamName" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/gl_47"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.47" />
+
+    <TextView
+        android:id="@+id/tv_Played"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="@string/res_playedLabel"
+        app:layout_constraintBottom_toBottomOf="@+id/iv_TeamBadge"
+        app:layout_constraintStart_toStartOf="@+id/gl_47"
+        app:layout_constraintTop_toTopOf="@+id/iv_TeamBadge"
+        app:layout_constraintVertical_bias="0.454"
+        app:layout_constraintWidth_percent="0.05" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/gl_55p"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.55" />
+
+    <TextView
+        android:id="@+id/tv_Wins"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="@string/res_winLabel"
+        app:layout_constraintBottom_toBottomOf="@+id/tv_Played"
+        app:layout_constraintStart_toStartOf="@+id/gl_55p"
+        app:layout_constraintTop_toTopOf="@+id/tv_Played"
+        app:layout_constraintVertical_bias="0.0"
+        app:layout_constraintWidth_percent="0.05" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/gl_63p"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.63" />
+
+    <TextView
+        android:id="@+id/tv_Draws"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="@string/res_drwLabel"
+        app:layout_constraintBottom_toBottomOf="@+id/tv_Wins"
+        app:layout_constraintStart_toStartOf="@+id/gl_63p"
+        app:layout_constraintTop_toTopOf="@+id/tv_Wins"
+        app:layout_constraintVertical_bias="0.0"
+        app:layout_constraintWidth_percent="0.05" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/gl_71p"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.71" />
+
+    <TextView
+        android:id="@+id/tv_Loss"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="@string/res_lossLabel"
+        app:layout_constraintBottom_toBottomOf="@+id/tv_Draws"
+        app:layout_constraintStart_toStartOf="@+id/gl_71p"
+        app:layout_constraintTop_toTopOf="@+id/tv_Draws"
+        app:layout_constraintVertical_bias="0.0"
+        app:layout_constraintWidth_percent="0.05" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/gl_79p"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.79" />
+
+    <TextView
+        android:id="@+id/tv_Diff"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="@string/res_diffLabel"
+        app:layout_constrainedWidth="false"
+        app:layout_constraintBottom_toBottomOf="@+id/tv_Loss"
+        app:layout_constraintStart_toStartOf="@+id/gl_79p"
+        app:layout_constraintTop_toTopOf="@+id/tv_Loss"
+        app:layout_constraintVertical_bias="0.0"
+        app:layout_constraintWidth_percent="0.05" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/gl_87p"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.87" />
+
+    <TextView
+        android:id="@+id/tv_Points"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="@string/res_pointsLabel"
+        app:layout_constraintBottom_toBottomOf="@+id/tv_Diff"
+        app:layout_constraintStart_toStartOf="@+id/gl_87p"
+        app:layout_constraintTop_toTopOf="@+id/tv_Diff"
+        app:layout_constraintVertical_bias="0.0"
+        app:layout_constraintWidth_percent="0.06" />
+
+    <View
+        android:id="@+id/divider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginRight="16dp"
+        android:background="?android:attr/listDivider"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_pos" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
