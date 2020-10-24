@@ -1,5 +1,6 @@
 package uk.ash.womensfootball;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -32,9 +33,16 @@ public class FixturesActivity extends ActivityBase {
         fixturesData = getTestData();
 
         RecyclerView recyclerView = findViewById(R.id.rv_FixtureTable);
-        RecyclerView.Adapter adapter = new FixtureRecyclerViewAdapter(getApplicationContext(), fixturesData);
+        RecyclerView.Adapter adapter = new FixtureRecyclerViewAdapter(getApplicationContext(), fixturesData, this);
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+    }
+
+    public void switchToEvents(){
+        Intent intent = new Intent(this, EventsActivity.class); //Intent, the activity we want to switch to
+        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION); //stops animation on switching activity, stops annoying flicker
+        //intent.putExtra("FROM_ACTIVITY", from); //can pass vars in bundle, useful later? pass the ref to DB
+        startActivity(intent); //start activity via context that called it
     }
 
     //returns some test data

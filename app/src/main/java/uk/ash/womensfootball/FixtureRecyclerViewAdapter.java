@@ -1,6 +1,7 @@
 package uk.ash.womensfootball;
 
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,9 +21,12 @@ public class FixtureRecyclerViewAdapter extends RecyclerView.Adapter<FixtureRecy
     //league data to be displayed
     private List<FixtureData> data;
 
-    public FixtureRecyclerViewAdapter(Context c, List<FixtureData> d){
+    private FixturesActivity fixturesActivity;
+
+    public FixtureRecyclerViewAdapter(Context c, List<FixtureData> d, FixturesActivity fA){
         context = c;
         data = d;
+        fixturesActivity = fA;
     }
 
     @NonNull
@@ -74,6 +78,9 @@ public class FixtureRecyclerViewAdapter extends RecyclerView.Adapter<FixtureRecy
             //data.get(pos).getTeamName();
             //then switch to fixtures and show only those upcoming games
 
+            fixturesActivity.switchToEvents();
+
         }
     }
 }
+

@@ -27,25 +27,23 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tb_Toolbar">
+        app:layout_constraintTop_toBottomOf="@+id/tb_Toolbar"
+        app:tabGravity="fill"
+        app:tabMaxWidth="0dp"
+        app:tabMode="fixed">
 
         <com.google.android.material.tabs.TabItem
             android:id="@+id/ti_League"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/res_league" />
 
         <com.google.android.material.tabs.TabItem
             android:id="@+id/ti_Fixtures"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/res_fixtures" />
 
-        <com.google.android.material.tabs.TabItem
-            android:id="@+id/ti_Events"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/res_events" />
     </com.google.android.material.tabs.TabLayout>
 
     <include
