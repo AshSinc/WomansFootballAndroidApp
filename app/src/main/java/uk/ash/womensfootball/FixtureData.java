@@ -1,5 +1,7 @@
 package uk.ash.womensfootball;
 
+import android.graphics.drawable.Drawable;
+
 import java.time.LocalDateTime;
 import java.util.Date;
 
@@ -7,62 +9,66 @@ import java.util.Date;
 public class FixtureData {
     private String teamNameH;
     private String teamNameA;
-    private String imagePathH;
-    private String imagePathA;
+    private Drawable badgeH; //home team logo
+    private Drawable badgeA; //away team logo
     private int homeScore;
     private int awayScore;
     private LocalDateTime dateTime;
 
-    public FixtureData(String nH, String nA, String iH, String iA, int hS, int aS, LocalDateTime dT){
+    public FixtureData(String nH, String nA, Drawable iH, Drawable iA, int hS, int aS, LocalDateTime dT){
         teamNameH = nH;
         teamNameA = nA;
-        imagePathH =iH;
-        imagePathA = iA;
+        badgeH =iH;
+        badgeA = iA;
         homeScore = hS;
         awayScore = aS;
         dateTime = dT;
     }
 
-    public void setTeamNameH(String n){
-        teamNameH = n;
-    }
+    //getters
     public String getTeamNameH(){
         return teamNameH;
-    }
-    public void setTeamNameA(String n){
-        teamNameA = n;
     }
     public String getTeamNameA(){
         return teamNameA;
     }
-    public void setImagePathH(String p){
-        imagePathH = p;
-    }
-    public String getImagePathH(){
-        return imagePathH;
-    }
-    public void setImagePathA(String p){
-        imagePathA = p;
-    }
-    public String getImagePathA(){
-        return imagePathA;
-    }
-    public void setHomeScore(int s){
-        homeScore = s;
-    }
     public int getHomeScore(){
         return homeScore;
-    }
-    public void setAwayScore(int s){
-        awayScore = s;
     }
     public int getAwayScore(){
         return awayScore;
     }
-    public void setDateTime(LocalDateTime d){
-        dateTime = d;
-    }
     public LocalDateTime getDateTime(){
         return dateTime;
     }
+    public Drawable getBadgeH() {
+        return badgeH;
+    }
+    public Drawable getBadgeA() {
+        return badgeA;
+    }
+
+    //setters - probably don't need
+    public void setTeamNameH(String n){
+        teamNameH = n;
+    }
+    public void setTeamNameA(String n){
+        teamNameA = n;
+    }
+    public void setBadgeH(Drawable p) {
+        badgeH = p;
+    }
+    public void setBadgeA(Drawable p) {
+        badgeA = p;
+    }
+    public void setHomeScore(int s){
+        homeScore = s;
+    }
+    public void setAwayScore(int s){
+        awayScore = s;
+    }
+    public void setDateTime(LocalDateTime d){
+        dateTime = d;
+    }
+
 }

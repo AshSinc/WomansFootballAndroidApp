@@ -50,21 +50,17 @@ public class FixturesActivity extends ActivityBase {
         List<FixtureData> dl = new ArrayList<>();
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
         LocalDateTime d = LocalDateTime.now();
-
-        dl.add(new FixtureData("Man U", "Arbroath", "", "", 1, 5, d));
-        dl.add(new FixtureData("Man U", "Arbroath", "", "", 1, 5, d));
-        dl.add(new FixtureData("Man U", "Arbroath", "", "", 1, 5, d));
-        dl.add(new FixtureData("Man U", "Arbroath", "", "", 1, 5, d));
-        dl.add(new FixtureData("Man U", "Arbroath", "", "", 1, 5, d));
-        dl.add(new FixtureData("Man U", "Arbroath", "", "", 1, 5, d));
-        dl.add(new FixtureData("Man U", "Arbroath", "", "", 1, 5, d));
-        dl.add(new FixtureData("Man U", "Arbroath", "", "", 1, 5, d));
-        dl.add(new FixtureData("Man U", "Arbroath", "", "", 1, 5, d));
-        dl.add(new FixtureData("Man U", "Arbroath", "", "", 1, 5, d));
-        dl.add(new FixtureData("Man U", "Arbroath", "", "", 1, 5, d));
-
-
-
+        dl.add(new FixtureData("Man U", "Arbroath", getBadgeForTeam(0), getBadgeForTeam(0), 1, 5, d));
+        dl.add(new FixtureData("Man U", "Arbroath", getBadgeForTeam(0), getBadgeForTeam(0), 1, 5, d));
+        dl.add(new FixtureData("Man U", "Arbroath", getBadgeForTeam(0), getBadgeForTeam(0), 1, 5, d));
+        dl.add(new FixtureData("Man U", "Arbroath", getBadgeForTeam(0), getBadgeForTeam(0), 1, 5, d));
+        dl.add(new FixtureData("Man U", "Arbroath", getBadgeForTeam(0), getBadgeForTeam(0), 1, 5, d));
+        dl.add(new FixtureData("Man U", "Arbroath", getBadgeForTeam(0), getBadgeForTeam(0), 1, 5, d));
+        dl.add(new FixtureData("Man U", "Arbroath", getBadgeForTeam(0), getBadgeForTeam(0), 1, 5, d));
+        dl.add(new FixtureData("Man U", "Arbroath", getBadgeForTeam(0), getBadgeForTeam(0), 1, 5, d));
+        dl.add(new FixtureData("Man U", "Arbroath", getBadgeForTeam(0), getBadgeForTeam(0), 1, 5, d));
+        dl.add(new FixtureData("Man U", "Arbroath", getBadgeForTeam(0), getBadgeForTeam(0), 1, 5, d));
+        dl.add(new FixtureData("Man U", "Arbroath", getBadgeForTeam(0), getBadgeForTeam(0), 1, 5, d));
         return dl;
     }
 }

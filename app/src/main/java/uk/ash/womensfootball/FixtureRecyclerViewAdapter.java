@@ -48,7 +48,7 @@ public class FixtureRecyclerViewAdapter extends RecyclerView.Adapter<FixtureRecy
         //((ImageView)holder.dataItemView.findViewById(R.id.iv_BadgeFixtureA)).setImageResource(R.drawable.imagePathA); // need to work on this and figure out best method
         ((TextView)holder.dataItemView.findViewById(R.id.tv_homeScore)).setText(String.valueOf(entry.getHomeScore()));
         ((TextView)holder.dataItemView.findViewById(R.id.tv_awayScore)).setText(String.valueOf(entry.getAwayScore()));
-        ((TextView)holder.dataItemView.findViewById(R.id.tv_time)).setText(String.valueOf(entry.getDateTime()));
+        ((TextView)holder.dataItemView.findViewById(R.id.tv_time)).setText(String.valueOf(entry.getDateTime().format(ActivityBase.TIME_PATTERN)));
     }
 
     @Override

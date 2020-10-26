@@ -52,8 +52,8 @@
         android:id="@+id/iv_TeamBadge"
         android:layout_width="30dp"
         android:layout_height="30dp"
-        android:background="@android:drawable/btn_star_big_on"
         android:contentDescription="@string/res_teamIconDescription"
+        android:foreground="@android:drawable/btn_star_big_on"
         app:layout_constraintBottom_toBottomOf="@+id/tv_TeamName"
         app:layout_constraintStart_toStartOf="@+id/gl_36p"
         app:layout_constraintTop_toTopOf="@+id/tv_TeamName" />

@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".LeagueActivity">
+    tools:context=".EventsActivity">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/tb_Toolbar"
@@ -24,8 +24,7 @@
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tabLayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toTopOf="@+id/rv_FixtureTable"
+        android:layout_height="0dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
@@ -53,16 +52,24 @@
             android:text="@string/res_events" />
     </com.google.android.material.tabs.TabLayout>
 
+    <include
+        android:id="@+id/includeFixtureListHead"
+        layout="@layout/fixture_list_view_item"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tabLayout" />
+
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rv_FixtureTable"
+        android:id="@+id/rv_EventTable"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tabLayout"
-        app:layout_constraintVertical_bias="1.0">
+        app:layout_constraintTop_toBottomOf="@+id/includeFixtureListHead">
 
     </androidx.recyclerview.widget.RecyclerView>
 

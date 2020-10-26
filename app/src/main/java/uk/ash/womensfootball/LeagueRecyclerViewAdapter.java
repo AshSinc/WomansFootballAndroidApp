@@ -38,10 +38,10 @@ public class LeagueRecyclerViewAdapter extends RecyclerView.Adapter<LeagueRecycl
     public void onBindViewHolder(@NonNull LeagueViewHolder holder, int pos) {
         //get data of table at position
         LeagueData entry = data.get(pos);
-        //update the TextViews
+        //update the Views
         ((TextView)holder.dataItemView.findViewById(R.id.tv_pos)).setText(String.valueOf(pos+1));
         ((TextView)holder.dataItemView.findViewById(R.id.tv_TeamName)).setText(entry.getTeamName());
-        //((ImageView)holder.dataItemView.findViewById(R.id.iv_TeamBadge)).setImageResource(R.drawable.imageName); // need to work on this and figure out best method
+        ((ImageView)holder.dataItemView.findViewById(R.id.iv_TeamBadge)).setForeground(entry.getBadge());
         ((TextView)holder.dataItemView.findViewById(R.id.tv_Played)).setText(String.valueOf(entry.getPlayed()));
         ((TextView)holder.dataItemView.findViewById(R.id.tv_Wins)).setText(String.valueOf(entry.getWins()));
         ((TextView)holder.dataItemView.findViewById(R.id.tv_Draws)).setText(String.valueOf(entry.getDraws()));
@@ -75,7 +75,7 @@ public class LeagueRecyclerViewAdapter extends RecyclerView.Adapter<LeagueRecycl
 
             //get team name from data at that pos.
             //data.get(pos).getTeamName();
-            //then switch to fixtures and show only those upcoming games
+            //then switch to fixtures and show only those upcoming games? maybe possible depends on api
 
         }
     }

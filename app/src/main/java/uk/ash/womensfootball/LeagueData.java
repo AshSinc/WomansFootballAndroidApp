@@ -1,19 +1,21 @@
 package uk.ash.womensfootball;
 
+import android.graphics.drawable.Drawable;
+
 //basic class to hold and retrieve league data
 public class LeagueData {
-    private String teamName;
-    private String imagePath;
-    private int played;
+    private String teamName; //team name
+    private Drawable badge; //team badge
+    private int played; //stats
     private int wins;
     private int draws;
     private int losses;
     private int goalDiff;
     private int points;
 
-    public LeagueData(String n, String path, int p, int w, int d, int l, int gd, int pts) {
+    public LeagueData(String n, Drawable b, int p, int w, int d, int l, int gd, int pts) {
         teamName = n;
-        imagePath = path;
+        badge = b;
         played = p;
         wins = w;
         draws = d;
@@ -22,67 +24,52 @@ public class LeagueData {
         points = pts;
     }
 
-    public void setTeamName(String n) {
-        teamName = n;
-    }
-
+    //getters
     public String getTeamName() {
         return teamName;
     }
-
-    public void setImagePath(String p) {
-        imagePath = p;
-    }
-
-    public String getImagePath() {
-        return imagePath;
-    }
-
-    public void setPlayed(int p) {
-        played = p;
-    }
-
     public int getPlayed() {
         return played;
     }
-
-    public void setWins(int w) {
-        wins = w;
-    }
-
     public int getWins() {
         return wins;
     }
-
-    public void setDraws(int d) {
-        draws = d;
-    }
-
     public int getDraws() {
         return draws;
     }
-
-    public void setLosses(int l) {
-        losses = l;
-    }
-
     public int getLosses() {
         return losses;
     }
-
-    public void setGoalDiff(int gd) {
-        goalDiff = gd;
-    }
-
     public int getGoalDiff() {
         return goalDiff;
     }
-
-    public void setPoints(int pts) {
-        points = pts;
-    }
-
     public int getPoints() {
         return points;
+    }
+    public Drawable getBadge() {
+        return badge;
+    }
+
+    //setters - maybe not needed
+    public void setTeamName(String n) {
+        teamName = n;
+    }
+    public void setPlayed(int p) {
+        played = p;
+    }
+    public void setWins(int w) {
+        wins = w;
+    }
+    public void setDraws(int d) {
+        draws = d;
+    }
+    public void setLosses(int l) {
+        losses = l;
+    }
+    public void setGoalDiff(int gd) {
+        goalDiff = gd;
+    }
+    public void setPoints(int pts) {
+        points = pts;
     }
 }

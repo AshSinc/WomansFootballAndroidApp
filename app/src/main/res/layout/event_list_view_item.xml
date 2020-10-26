@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <ImageView
+        android:id="@+id/iv_eventIconA"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:contentDescription="@string/res_teamIconDescription"
+        android:foreground="@android:drawable/btn_star_big_on"
+        app:layout_constraintBottom_toBottomOf="@+id/tv_descriptionA"
+        app:layout_constraintStart_toEndOf="@+id/tv_descriptionA"
+        app:layout_constraintTop_toTopOf="@+id/tv_descriptionA" />
+
+    <TextView
+        android:id="@+id/tv_eventTimeA"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        app:layout_constraintBottom_toBottomOf="@+id/tv_eventTimeH"
+        app:layout_constraintStart_toStartOf="@+id/guideline8"
+        app:layout_constraintTop_toTopOf="@+id/tv_eventTimeH"
+        app:layout_constraintWidth_percent="0.05"
+        tools:text="8" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline8"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.52" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline9"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.6" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.495"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline7"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.42" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.06" />
+
+    <View
+        android:id="@+id/divider3"
+        android:layout_width="1dp"
+        android:layout_height="69dp"
+        android:background="?android:attr/listDivider"
+        app:layout_constraintStart_toStartOf="@+id/guideline3"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/iv_eventIconH"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginTop="16dp"
+        android:contentDescription="@string/res_teamIconDescription"
+        android:foreground="@android:drawable/btn_star_big_on"
+        app:layout_constraintStart_toStartOf="@+id/guideline5"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_descriptionH"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        app:layout_constraintBottom_toBottomOf="@+id/iv_eventIconH"
+        app:layout_constraintStart_toEndOf="@+id/iv_eventIconH"
+        app:layout_constraintTop_toTopOf="@+id/iv_eventIconH"
+        app:layout_constraintWidth_percent="0.25"
+        tools:text="Someone scored " />
+
+    <TextView
+        android:id="@+id/tv_descriptionA"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        app:layout_constraintBottom_toBottomOf="@+id/tv_eventTimeA"
+        app:layout_constraintStart_toStartOf="@+id/guideline9"
+        app:layout_constraintTop_toTopOf="@+id/tv_eventTimeA"
+        app:layout_constraintWidth_percent="0.25"
+        tools:text="Someone scored " />
+
+    <TextView
+        android:id="@+id/tv_eventTimeH"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        app:layout_constraintBottom_toBottomOf="@+id/tv_descriptionH"
+        app:layout_constraintStart_toStartOf="@+id/guideline7"
+        app:layout_constraintTop_toTopOf="@+id/tv_descriptionH"
+        app:layout_constraintVertical_bias="0.5"
+        app:layout_constraintWidth_percent="0.05"
+        tools:text="8" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

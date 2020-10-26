@@ -2,25 +2,32 @@ package uk.ash.womensfootball;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 
 import com.google.android.material.tabs.TabLayout;
+
+import java.time.format.DateTimeFormatter;
 
 //acts as a base class for the three Activity tabs
 public class ActivityBase extends AppCompatActivity {
 
-    private static String TAG = "DebugTag";
+    protected static String TAG = "DebugTag";
+    //custom date/time pattern
+    //protected static DateTimeFormatter TIME_PATTERN = DateTimeFormatter.ofPattern("d LLL yy 'Kickoff' hh:mm a");
+    protected static DateTimeFormatter TIME_PATTERN = DateTimeFormatter.ofPattern("d LLL 'Kickoff' hh:mm a");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        int activitySelected = 0; //tracks currently selected activity, assume start at 0
+        int activitySelected = 0; //tracks currently selected activity, default to 0
 
         // checks savedInstanceState for ACTIVITY number for setting setContentView to correct layout
         if (savedInstanceState != null) {
@@ -42,11 +49,11 @@ public class ActivityBase extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.tb_Toolbar);
         //toolbar.setTitle(getString(R.string.res_league)); //change the ActionBarTitle
         setSupportActionBar(toolbar); // Sets the Toolbar to act as the ActionBar for this Activity window.
-        getSupportActionBar().setDisplayShowTitleEnabled(false); //hide the title, not needed as we have tabs right now
+        getSupportActionBar().setDisplayShowTitleEnabled(false); //hide the title, possibly use for displaying League Name
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabLayout); //get the tab bar
         tabLayout.selectTab(tabLayout.getTabAt(activitySelected), true);  //re-selects the correct tab using the value passed by savedInstanceState
-        //adds a new listener to the tabLayout, and passes a new TabSelectedActivitySwitch to control activity switching, have to pass context, this passes the child context if called from child it seems, need to test
+        //adds a new listener to the tabLayout, and passes a new TabSelectedActivitySwitch to control activity switching, have to pass context, this passes the child context if called from child instance
         tabLayout.addOnTabSelectedListener(new ActivityBase.TabSelectedActivitySwitch(this));
     }
 
@@ -64,6 +71,24 @@ public class ActivityBase extends AppCompatActivity {
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION); //stops animation on switching activity, stops annoying flicker
         //intent.putExtra("FROM_ACTIVITY", from); //can pass vars in bundle, useful later?
         context.startActivity(intent); //start activity via context that called it
+    }
+
+
+    //returns the badge for Team, needed in all activities
+    //todo - need to set up an array or DB of teams and get all their badges stored - associate id and teams/badges
+    public Drawable getBadgeForTeam(int id){
+        Drawable d;
+        switch (id){
+            //case(0): d = ContextCompat.getDrawable(this, R.drawable.team0); break;
+            //case(1): d = ContextCompat.getDrawable(this, R.drawable.team1); break;
+           // case(2): d = ContextCompat.getDrawable(this, R.drawable.team2); break;
+            case(3): d = null; break;
+            case(4): d = null; break;
+            case(5): d = null; break;
+            default:
+                d = ContextCompat.getDrawable(this, android.R.drawable.btn_star_big_on);
+        }
+        return d;
     }
 
     protected static class TabSelectedActivitySwitch implements TabLayout.OnTabSelectedListener {
@@ -86,10 +111,10 @@ public class ActivityBase extends AppCompatActivity {
                     Log.d(TAG, "switch1: tab ");
                     switchActivityTo(FixturesActivity.class, context);
                     break;
-                case 2:
-                    Log.d(TAG, "switch2: tab");
-                    switchActivityTo(EventsActivity.class, context);
-                    break;
+                //case 2: //not needed
+                //    Log.d(TAG, "switch2: tab");
+                //    switchActivityTo(EventsActivity.class, context);
+                //    break;
             }
         }
 
