@@ -10,7 +10,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.06" />
+        app:layout_constraintGuide_percent="0.04" />
 
     <TextView
         android:id="@+id/tv_pos"
@@ -18,6 +18,8 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:gravity="center"
+        app:layout_constraintEnd_toStartOf="@+id/gl_14p"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/gl_6p"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintWidth_percent="0.05" />
@@ -27,7 +29,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.14" />
+        app:layout_constraintGuide_percent="0.11" />
 
     <TextView
         android:id="@+id/tv_TeamName"
@@ -36,6 +38,7 @@
         android:gravity="center"
         android:text="@string/res_clubLabel"
         app:layout_constraintBottom_toBottomOf="@+id/tv_pos"
+        app:layout_constraintEnd_toStartOf="@+id/gl_36p"
         app:layout_constraintStart_toStartOf="@+id/gl_14p"
         app:layout_constraintTop_toTopOf="@+id/tv_pos"
         app:layout_constraintVertical_bias="1.0"
@@ -46,7 +49,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.36" />
+        app:layout_constraintGuide_percent="0.34" />
 
     <ImageView
         android:id="@+id/iv_TeamBadge"
@@ -55,6 +58,7 @@
         android:contentDescription="@string/res_teamIconDescription"
         android:foreground="@android:drawable/btn_star_big_on"
         app:layout_constraintBottom_toBottomOf="@+id/tv_TeamName"
+        app:layout_constraintEnd_toStartOf="@+id/gl_47"
         app:layout_constraintStart_toStartOf="@+id/gl_36p"
         app:layout_constraintTop_toTopOf="@+id/tv_TeamName" />
 
@@ -63,15 +67,16 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.47" />
+        app:layout_constraintGuide_percent="0.45" />
 
     <TextView
         android:id="@+id/tv_Played"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center"
         android:text="@string/res_playedLabel"
         app:layout_constraintBottom_toBottomOf="@+id/iv_TeamBadge"
+        app:layout_constraintEnd_toStartOf="@+id/gl_55p"
         app:layout_constraintStart_toStartOf="@+id/gl_47"
         app:layout_constraintTop_toTopOf="@+id/iv_TeamBadge"
         app:layout_constraintVertical_bias="0.454"
@@ -82,15 +87,16 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.55" />
+        app:layout_constraintGuide_percent="0.53" />
 
     <TextView
         android:id="@+id/tv_Wins"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center"
         android:text="@string/res_winLabel"
         app:layout_constraintBottom_toBottomOf="@+id/tv_Played"
+        app:layout_constraintEnd_toStartOf="@+id/gl_63p"
         app:layout_constraintStart_toStartOf="@+id/gl_55p"
         app:layout_constraintTop_toTopOf="@+id/tv_Played"
         app:layout_constraintVertical_bias="0.0"
@@ -101,15 +107,16 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.63" />
+        app:layout_constraintGuide_percent="0.61" />
 
     <TextView
         android:id="@+id/tv_Draws"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center"
         android:text="@string/res_drwLabel"
         app:layout_constraintBottom_toBottomOf="@+id/tv_Wins"
+        app:layout_constraintEnd_toStartOf="@+id/gl_71p"
         app:layout_constraintStart_toStartOf="@+id/gl_63p"
         app:layout_constraintTop_toTopOf="@+id/tv_Wins"
         app:layout_constraintVertical_bias="0.0"
@@ -120,15 +127,16 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.71" />
+        app:layout_constraintGuide_percent="0.69" />
 
     <TextView
         android:id="@+id/tv_Loss"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center"
         android:text="@string/res_lossLabel"
         app:layout_constraintBottom_toBottomOf="@+id/tv_Draws"
+        app:layout_constraintEnd_toStartOf="@+id/gl_79p"
         app:layout_constraintStart_toStartOf="@+id/gl_71p"
         app:layout_constraintTop_toTopOf="@+id/tv_Draws"
         app:layout_constraintVertical_bias="0.0"
@@ -139,16 +147,17 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.79" />
+        app:layout_constraintGuide_percent="0.77" />
 
     <TextView
         android:id="@+id/tv_Diff"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center"
         android:text="@string/res_diffLabel"
         app:layout_constrainedWidth="false"
         app:layout_constraintBottom_toBottomOf="@+id/tv_Loss"
+        app:layout_constraintEnd_toStartOf="@+id/gl_87p"
         app:layout_constraintStart_toStartOf="@+id/gl_79p"
         app:layout_constraintTop_toTopOf="@+id/tv_Loss"
         app:layout_constraintVertical_bias="0.0"
@@ -163,11 +172,12 @@
 
     <TextView
         android:id="@+id/tv_Points"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center"
         android:text="@string/res_pointsLabel"
         app:layout_constraintBottom_toBottomOf="@+id/tv_Diff"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/gl_87p"
         app:layout_constraintTop_toTopOf="@+id/tv_Diff"
         app:layout_constraintVertical_bias="0.0"

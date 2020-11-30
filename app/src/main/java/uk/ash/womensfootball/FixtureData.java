@@ -14,8 +14,9 @@ public class FixtureData {
     private int homeScore;
     private int awayScore;
     private LocalDateTime dateTime;
+    private int fixtureId; //fixture id from Fixtures API
 
-    public FixtureData(String nH, String nA, Drawable iH, Drawable iA, int hS, int aS, LocalDateTime dT){
+    public FixtureData(String nH, String nA, Drawable iH, Drawable iA, int hS, int aS, LocalDateTime dT, int id){
         teamNameH = nH;
         teamNameA = nA;
         badgeH =iH;
@@ -23,6 +24,7 @@ public class FixtureData {
         homeScore = hS;
         awayScore = aS;
         dateTime = dT;
+        fixtureId = id;
     }
 
     //getters
@@ -46,6 +48,9 @@ public class FixtureData {
     }
     public Drawable getBadgeA() {
         return badgeA;
+    }
+    public int getFixtureId(){
+        return fixtureId;
     }
 
     //setters - probably don't need

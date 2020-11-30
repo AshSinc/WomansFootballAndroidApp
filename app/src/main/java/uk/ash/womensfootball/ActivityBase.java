@@ -2,6 +2,7 @@ package uk.ash.womensfootball;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
@@ -14,6 +15,7 @@ import androidx.core.content.ContextCompat;
 import com.google.android.material.tabs.TabLayout;
 
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 
 //acts as a base class for the three Activity tabs
 public class ActivityBase extends AppCompatActivity {
@@ -22,10 +24,14 @@ public class ActivityBase extends AppCompatActivity {
     //custom date/time pattern
     //protected static DateTimeFormatter TIME_PATTERN = DateTimeFormatter.ofPattern("d LLL yy 'Kickoff' hh:mm a");
     protected static DateTimeFormatter TIME_PATTERN = DateTimeFormatter.ofPattern("d LLL 'Kickoff' hh:mm a");
+    protected static SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // instantiate the sharedPreferences
+        sharedPreferences = getSharedPreferences(getString(R.string.shared_pref_file), MODE_PRIVATE);
 
         int activitySelected = 0; //tracks currently selected activity, default to 0
 
@@ -76,17 +82,17 @@ public class ActivityBase extends AppCompatActivity {
 
     //returns the badge for Team, needed in all activities
     //todo - need to set up an array or DB of teams and get all their badges stored - associate id and teams/badges
-    public Drawable getBadgeForTeam(int id){
+    public static Drawable getBadgeForTeam(Context context, int id){
         Drawable d;
         switch (id){
-            //case(0): d = ContextCompat.getDrawable(this, R.drawable.team0); break;
-            //case(1): d = ContextCompat.getDrawable(this, R.drawable.team1); break;
-           // case(2): d = ContextCompat.getDrawable(this, R.drawable.team2); break;
+            //case(0): d = ContextCompat.getDrawable(context, R.drawable.team0); break;
+            //case(1): d = ContextCompat.getDrawable(context, R.drawable.team1); break;
+           // case(2): d = ContextCompat.getDrawable(context, R.drawable.team2); break;
             case(3): d = null; break;
             case(4): d = null; break;
             case(5): d = null; break;
             default:
-                d = ContextCompat.getDrawable(this, android.R.drawable.btn_star_big_on);
+                d = ContextCompat.getDrawable(context, android.R.drawable.btn_star_big_on);
         }
         return d;
     }

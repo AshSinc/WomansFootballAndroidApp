@@ -38,10 +38,12 @@ public class LeagueRecyclerViewAdapter extends RecyclerView.Adapter<LeagueRecycl
     public void onBindViewHolder(@NonNull LeagueViewHolder holder, int pos) {
         //get data of table at position
         LeagueData entry = data.get(pos);
+        int teamId = entry.getTeamId();
         //update the Views
         ((TextView)holder.dataItemView.findViewById(R.id.tv_pos)).setText(String.valueOf(pos+1));
         ((TextView)holder.dataItemView.findViewById(R.id.tv_TeamName)).setText(entry.getTeamName());
-        ((ImageView)holder.dataItemView.findViewById(R.id.iv_TeamBadge)).setForeground(entry.getBadge());
+        //((ImageView)holder.dataItemView.findViewById(R.id.iv_TeamBadge)).setForeground(entry.getBadge());
+        ((ImageView)holder.dataItemView.findViewById(R.id.iv_TeamBadge)).setForeground(ActivityBase.getBadgeForTeam(context,teamId));
         ((TextView)holder.dataItemView.findViewById(R.id.tv_Played)).setText(String.valueOf(entry.getPlayed()));
         ((TextView)holder.dataItemView.findViewById(R.id.tv_Wins)).setText(String.valueOf(entry.getWins()));
         ((TextView)holder.dataItemView.findViewById(R.id.tv_Draws)).setText(String.valueOf(entry.getDraws()));
