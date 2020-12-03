@@ -9,16 +9,15 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.WomensFootball">
-        <activity android:name=".LeagueActivity">
+        <activity android:name=".league.LeagueActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".FixturesActivity"></activity>
-        <activity android:name=".EventsActivity"></activity>
-
+        <activity android:name=".fixture.FixturesActivity"></activity>
+        <activity android:name=".event.EventsActivity"></activity>
 
     </application>
 

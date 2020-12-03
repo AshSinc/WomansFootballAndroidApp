@@ -1,4 +1,4 @@
-package uk.ash.womensfootball;
+package uk.ash.womensfootball.event;
 
 import android.graphics.drawable.Drawable;
 

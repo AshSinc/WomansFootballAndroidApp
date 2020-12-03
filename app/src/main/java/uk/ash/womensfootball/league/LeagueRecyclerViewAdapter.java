@@ -1,4 +1,4 @@
-package uk.ash.womensfootball;
+package uk.ash.womensfootball.league;
 
 import android.content.Context;
 import android.util.Log;
@@ -12,6 +12,9 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
+
+import uk.ash.womensfootball.ActivityBase;
+import uk.ash.womensfootball.R;
 
 public class LeagueRecyclerViewAdapter extends RecyclerView.Adapter<LeagueRecyclerViewAdapter.LeagueViewHolder> {
 
@@ -42,7 +45,6 @@ public class LeagueRecyclerViewAdapter extends RecyclerView.Adapter<LeagueRecycl
         //update the Views
         ((TextView)holder.dataItemView.findViewById(R.id.tv_pos)).setText(String.valueOf(pos+1));
         ((TextView)holder.dataItemView.findViewById(R.id.tv_TeamName)).setText(entry.getTeamName());
-        //((ImageView)holder.dataItemView.findViewById(R.id.iv_TeamBadge)).setForeground(entry.getBadge());
         ((ImageView)holder.dataItemView.findViewById(R.id.iv_TeamBadge)).setForeground(ActivityBase.getBadgeForTeam(context,teamId));
         ((TextView)holder.dataItemView.findViewById(R.id.tv_Played)).setText(String.valueOf(entry.getPlayed()));
         ((TextView)holder.dataItemView.findViewById(R.id.tv_Wins)).setText(String.valueOf(entry.getWins()));
@@ -50,6 +52,8 @@ public class LeagueRecyclerViewAdapter extends RecyclerView.Adapter<LeagueRecycl
         ((TextView)holder.dataItemView.findViewById(R.id.tv_Loss)).setText(String.valueOf(entry.getLosses()));
         ((TextView)holder.dataItemView.findViewById(R.id.tv_Diff)).setText(String.valueOf(entry.getGoalDiff()));
         ((TextView)holder.dataItemView.findViewById(R.id.tv_Points)).setText(String.valueOf(entry.getPoints()));
+
+        Log.d("IDTeams", "teamname : " + entry.getTeamName() + ", id : " + entry.getTeamId());
     }
 
     @Override

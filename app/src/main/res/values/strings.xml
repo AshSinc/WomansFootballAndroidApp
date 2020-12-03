@@ -18,8 +18,12 @@
 
     <string name="shared_pref_file" translatable="false">uk.ash.womensfootball</string>
     <string name="shared_pref_league_id" translatable="false">2745</string>
-    <string name="shared_pref_league_update" translatable="false"></string>
-   <!-- <string name="shared_pref_temp_unit_celsuis" translatable="false">C</string>
-    <string name="shared_pref_temp_unit_fahrenheit" translatable="false">F</string>
-    <string name="shared_pref_favourite_locations" translatable="false">favourite_locations</string> -->
+    <string name="shared_pref_league_2745_update" translatable="false"></string>
+
+    <!-- Need to add the other leagues here TODO
+    <string name="shared_pref_league_2745_update" translatable="false"></string>
+    <string name="shared_pref_league_2745_update" translatable="false"></string>
+    <string name="shared_pref_league_2745_update" translatable="false"></string>-->
+
+    <string name="shared_pref_fixture_2745_update" translatable="false"></string>
 </resources>

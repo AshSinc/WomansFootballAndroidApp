@@ -1,7 +1,6 @@
-package uk.ash.womensfootball;
+package uk.ash.womensfootball.fixture;
 
 import android.content.Context;
-import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +11,9 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
+
+import uk.ash.womensfootball.ActivityBase;
+import uk.ash.womensfootball.R;
 
 public class FixtureRecyclerViewAdapter extends RecyclerView.Adapter<FixtureRecyclerViewAdapter.FixtureViewHolder> {
 

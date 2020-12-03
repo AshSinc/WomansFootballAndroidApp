@@ -1,12 +1,24 @@
-package uk.ash.womensfootball;
+package uk.ash.womensfootball.fixture;
 
 import android.graphics.drawable.Drawable;
+
+import androidx.annotation.NonNull;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
 
 import java.time.LocalDateTime;
 import java.util.Date;
 
 //basic class to hold and retrieve fixture data
+@Entity(tableName = "fixture_data")
 public class FixtureData {
+
+    @NonNull
+    @PrimaryKey
+    private int fixtureId; //fixture id from Fixtures API
+
+    private int leagueId; //league id from league API
+
     private String teamNameH;
     private String teamNameA;
     private Drawable badgeH; //home team logo
@@ -14,7 +26,6 @@ public class FixtureData {
     private int homeScore;
     private int awayScore;
     private LocalDateTime dateTime;
-    private int fixtureId; //fixture id from Fixtures API
 
     public FixtureData(String nH, String nA, Drawable iH, Drawable iA, int hS, int aS, LocalDateTime dT, int id){
         teamNameH = nH;
@@ -74,6 +85,9 @@ public class FixtureData {
     }
     public void setDateTime(LocalDateTime d){
         dateTime = d;
+    }
+    public void setFixtureId(int i){
+        fixtureId = i;
     }
 
 }

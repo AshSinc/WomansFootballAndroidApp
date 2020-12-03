@@ -1,7 +1,6 @@
 package uk.ash.womensfootball;
 
 import android.content.Context;
-import android.graphics.drawable.Drawable;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -10,19 +9,21 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-public class JsonToLeagueTask {
+import uk.ash.womensfootball.fixture.FixtureData;
+import uk.ash.womensfootball.league.LeagueData;
 
-    private List<LeagueData> league = new ArrayList<>();
+public class JsonToDataTask {
 
     public List<LeagueData> getLeagueFromJSON(Context context, String jsonString) {
+        List<LeagueData> league = new ArrayList<>();
         try {
             JSONObject jsonObj = new JSONObject(jsonString);
             //get the standings array for each team
             JSONArray standingsJsonObj = jsonObj.getJSONObject("api").getJSONArray("standings").getJSONArray(0);
             String name;
-            int played,wins,draws,losses,goaldif,points,id;
+            int played, wins, draws, losses, goaldif, points, id;
 
-            for (int x = 0 ; x < standingsJsonObj.length(); x++){
+            for (int x = 0; x < standingsJsonObj.length(); x++) {
                 //loop through each team entry and extract data
                 JSONObject teamJsonObj = standingsJsonObj.getJSONObject(x);
                 name = teamJsonObj.getString("teamName");
@@ -45,4 +46,18 @@ public class JsonToLeagueTask {
             return null;
         }
     }
+
+    public List<FixtureData> getFixtureFromJSON(Context context, String jsonString) {
+        List<FixtureData> fixture = new ArrayList<>();
+        try {
+            JSONObject jsonObj = new JSONObject(jsonString);
+            //TODO got here
+            Log.d("JSON TO FIXTURE TASK", "getFixtureFromJSON: " + jsonObj);
+            return fixture;
+        } catch (Exception e) {
+            Log.d("getFixtureFromJSON ", e.toString());
+            return null;
+        }
+    }
 }
+

@@ -1,11 +1,13 @@
-package uk.ash.womensfootball;
+package uk.ash.womensfootball.league;
 import android.content.Context;
 import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
 import androidx.room.TypeConverters;
 
-@Database(entities={LeagueData.class}, version=1)
+import uk.ash.womensfootball.Converters;
+
+@Database(entities={LeagueData.class}, version=1, exportSchema = false)
 @TypeConverters({Converters.class})
 public abstract class LeagueDatabase extends RoomDatabase {
 

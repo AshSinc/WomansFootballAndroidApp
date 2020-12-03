@@ -1,4 +1,4 @@
-package uk.ash.womensfootball;
+package uk.ash.womensfootball.league;
 
 import android.graphics.drawable.Drawable;
 
@@ -16,8 +16,6 @@ public class LeagueData {
 
     private String leagueId; //league name
     private String teamName; //team name
-    //private Drawable badge; //team badge
-    //private String badge; //team badge
     private int played; //stats
     private int wins;
     private int draws;
@@ -26,12 +24,10 @@ public class LeagueData {
     private int points;
     private int teamId; //teamID from Api
 
-
     public LeagueData(String teamName, int played, int wins, int draws, int losses, int goalDiff, int points, int teamId) {
         this.leagueId = "2745"; //temp hardcoded, should be passed in TODO
         this.teamName = teamName;
         this.uid = leagueId+teamName;
-       // badge = b;
         this.played = played;
         this.wins = wins;
         this.draws = draws;
@@ -63,9 +59,7 @@ public class LeagueData {
     public int getPoints() {
         return points;
     }
-    //public String getBadge() {
-    //    return badge;
-    //}
+
     public int getTeamId(){
         return teamId;
     }
@@ -104,7 +98,6 @@ public class LeagueData {
     public void setUid(String i){
         uid = i;
     }
-    public void setLeagueId(String s){
-        leagueId = s;
-    }
+    public void setLeagueId(String s){ leagueId = s;}
 }
+

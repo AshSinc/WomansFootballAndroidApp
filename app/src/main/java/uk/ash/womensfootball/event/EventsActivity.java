@@ -1,23 +1,19 @@
-package uk.ash.womensfootball;
+package uk.ash.womensfootball.event;
 
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
+
+import uk.ash.womensfootball.ActivityBase;
+import uk.ash.womensfootball.R;
 
 
 public class EventsActivity extends ActivityBase {
