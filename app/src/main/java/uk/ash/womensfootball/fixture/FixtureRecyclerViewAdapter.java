@@ -5,6 +5,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -14,6 +15,7 @@ import java.util.List;
 
 import uk.ash.womensfootball.ActivityBase;
 import uk.ash.womensfootball.R;
+import uk.ash.womensfootball.league.LeagueData;
 
 public class FixtureRecyclerViewAdapter extends RecyclerView.Adapter<FixtureRecyclerViewAdapter.FixtureViewHolder> {
 
@@ -43,11 +45,13 @@ public class FixtureRecyclerViewAdapter extends RecyclerView.Adapter<FixtureRecy
     public void onBindViewHolder(@NonNull FixtureViewHolder holder, int pos) {
         //get data of table at position
         FixtureData entry = data.get(pos);
+        int teamIdH = entry.getTeamIdH();
+        int teamIdA = entry.getTeamIdA();
         //update the TextViews
         ((TextView)holder.dataItemView.findViewById(R.id.tv_TeamNameH)).setText(entry.getTeamNameH());
         ((TextView)holder.dataItemView.findViewById(R.id.tv_TeamNameA)).setText(entry.getTeamNameA());
-        //((ImageView)holder.dataItemView.findViewById(R.id.iv_BadgeFixtureH)).setImageResource(R.drawable.imagePathH); // need to work on this and figure out best method
-        //((ImageView)holder.dataItemView.findViewById(R.id.iv_BadgeFixtureA)).setImageResource(R.drawable.imagePathA); // need to work on this and figure out best method
+        ((ImageView)holder.dataItemView.findViewById(R.id.iv_BadgeFixtureH)).setForeground(ActivityBase.getBadgeForTeam(context,teamIdH));
+        ((ImageView)holder.dataItemView.findViewById(R.id.iv_BadgeFixtureA)).setForeground(ActivityBase.getBadgeForTeam(context,teamIdA));
         ((TextView)holder.dataItemView.findViewById(R.id.tv_homeScore)).setText(String.valueOf(entry.getHomeScore()));
         ((TextView)holder.dataItemView.findViewById(R.id.tv_awayScore)).setText(String.valueOf(entry.getAwayScore()));
         ((TextView)holder.dataItemView.findViewById(R.id.tv_time)).setText(String.valueOf(entry.getDateTime().format(ActivityBase.TIME_PATTERN)));

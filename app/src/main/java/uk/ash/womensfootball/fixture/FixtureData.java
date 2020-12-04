@@ -16,26 +16,25 @@ public class FixtureData {
     @NonNull
     @PrimaryKey
     private int fixtureId; //fixture id from Fixtures API
-
     private int leagueId; //league id from league API
-
     private String teamNameH;
     private String teamNameA;
-    private Drawable badgeH; //home team logo
-    private Drawable badgeA; //away team logo
     private int homeScore;
     private int awayScore;
     private LocalDateTime dateTime;
+    private int teamIdH; //teamID from Api
+    private int teamIdA; //teamID from Api
 
-    public FixtureData(String nH, String nA, Drawable iH, Drawable iA, int hS, int aS, LocalDateTime dT, int id){
-        teamNameH = nH;
-        teamNameA = nA;
-        badgeH =iH;
-        badgeA = iA;
-        homeScore = hS;
-        awayScore = aS;
-        dateTime = dT;
-        fixtureId = id;
+    public FixtureData(int fixtureId, int leagueId, String teamNameH, String teamNameA, int homeScore, int awayScore, LocalDateTime dateTime, int teamIdH, int teamIdA){
+        this.fixtureId = fixtureId;
+        this.leagueId = leagueId;
+        this.teamNameH = teamNameH;
+        this.teamNameA = teamNameA;
+        this.homeScore = homeScore;
+        this.awayScore = awayScore;
+        this.dateTime = dateTime;
+        this.teamIdH = teamIdH;
+        this.teamIdA = teamIdA;
     }
 
     //getters
@@ -54,14 +53,18 @@ public class FixtureData {
     public LocalDateTime getDateTime(){
         return dateTime;
     }
-    public Drawable getBadgeH() {
-        return badgeH;
-    }
-    public Drawable getBadgeA() {
-        return badgeA;
-    }
+
     public int getFixtureId(){
         return fixtureId;
+    }
+    public int getLeagueId(){
+        return leagueId;
+    }
+    public int getTeamIdH(){
+        return teamIdH;
+    }
+    public int getTeamIdA(){
+        return teamIdA;
     }
 
     //setters - probably don't need
@@ -70,12 +73,6 @@ public class FixtureData {
     }
     public void setTeamNameA(String n){
         teamNameA = n;
-    }
-    public void setBadgeH(Drawable p) {
-        badgeH = p;
-    }
-    public void setBadgeA(Drawable p) {
-        badgeA = p;
     }
     public void setHomeScore(int s){
         homeScore = s;

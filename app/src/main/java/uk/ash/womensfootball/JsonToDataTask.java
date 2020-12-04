@@ -6,6 +6,9 @@ import android.util.Log;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,7 +30,6 @@ public class JsonToDataTask {
                 //loop through each team entry and extract data
                 JSONObject teamJsonObj = standingsJsonObj.getJSONObject(x);
                 name = teamJsonObj.getString("teamName");
-                //Drawable badge = ActivityBase.getBadgeForTeam(context ,0);
                 JSONObject allJsonObj = teamJsonObj.getJSONObject("all");
 
                 played = allJsonObj.getInt("matchsPlayed");
@@ -51,8 +53,39 @@ public class JsonToDataTask {
         List<FixtureData> fixture = new ArrayList<>();
         try {
             JSONObject jsonObj = new JSONObject(jsonString);
-            //TODO got here
-            Log.d("JSON TO FIXTURE TASK", "getFixtureFromJSON: " + jsonObj);
+            //get the fixtures array
+            JSONArray fixturesJsonArray = jsonObj.getJSONObject("api").getJSONArray("fixtures");
+
+            int fixtureId, leagueId, teamIdH, teamIdA;
+            Integer homeScore = 0, awayScore = 0;
+            String teamNameH, teamNameA;
+            LocalDateTime dateTime;
+
+            for (int x = 0; x < fixturesJsonArray.length(); x++) {
+                //loop through each fixture entry and extract data
+                JSONObject fixtureJsonObj = fixturesJsonArray.getJSONObject(x);
+                fixtureId = fixtureJsonObj.getInt("fixture_id");
+                leagueId = fixtureJsonObj.getInt("league_id");
+                JSONObject homeTeamObj = fixtureJsonObj.getJSONObject("homeTeam");
+                teamIdH = homeTeamObj.getInt("team_id");
+                teamNameH = homeTeamObj.getString("team_name");
+                JSONObject awayTeamObj = fixtureJsonObj.getJSONObject("awayTeam");
+                teamIdA = awayTeamObj.getInt("team_id");
+                teamNameA = awayTeamObj.getString("team_name");
+
+                try {
+                    homeScore = fixtureJsonObj.getInt("goalsHomeTeam");
+                } catch (Exception e) {/*ignore because its null, so leave as 0*/}
+                try {
+                    awayScore = fixtureJsonObj.getInt("goalsAwayTeam");
+                } catch (Exception e) {/*ignore because its null, so leave as 0*/}
+
+                dateTime = Converters.ldtFromLong(fixtureJsonObj.getLong("event_timestamp"));
+
+                //add to league list for return
+                fixture.add(new FixtureData(fixtureId, leagueId, teamNameH, teamNameA, homeScore, awayScore, dateTime, teamIdH, teamIdA));
+            }
+            Log.d("JSON TO FIXTURE TASK", "getFixtureFromJSON: " + fixture);
             return fixture;
         } catch (Exception e) {
             Log.d("getFixtureFromJSON ", e.toString());

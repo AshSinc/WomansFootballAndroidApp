@@ -18,6 +18,8 @@ import com.android.volley.toolbox.Volley;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,9 +33,11 @@ import uk.ash.womensfootball.league.LeagueRecyclerViewAdapter;
 
 public class FixturesActivity extends ActivityBase {
     private List<FixtureData> fixturesData;
+    private List<FixtureData> lastFixtures;
+    private List<FixtureData> nextFixtures;
     private String selectedLeague = "2745";
     private FixtureDao fixtureDao;
-    private long lastDBRefresh;// = System.currentTimeMillis();
+    private long lastDBRefresh;
     private long MIN_AGE = 600000; //milliseconds, 60,000 in 1 minute
 
     @Override
@@ -75,8 +79,6 @@ public class FixturesActivity extends ActivityBase {
                 shouldRefreshData = true;
         }
 
-        fixturesData = getTestData();
-
         if (shouldRefreshData) {
             requestFixtureUpdate();
         } else {
@@ -91,34 +93,77 @@ public class FixturesActivity extends ActivityBase {
         //send Volley request to url
         RequestQueue queue = Volley.newRequestQueue(this);
 
+
+
         FixturesActivity fa = this; //passing through to recycler view adapter, so we can navigate from Fixture to Event view
-        //TODO need to edit this string getLeagueURL
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, getLeagueURL(selectedLeague),
+        StringRequest stringRequestLast = new StringRequest(Request.Method.GET, getLastFixturesURL(selectedLeague),
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
                         // Display the first 500 characters of the response string.
-                        //Log.d(TAG, "onResponse: " + response);
+                        Log.d(TAG, "onResponse: " + response);
 
                         //call getLeagueFromJSON and parse the response to a new league list object
                         JsonToDataTask jsonToData = new JsonToDataTask();
-                        fixturesData = jsonToData.getFixtureFromJSON(getApplicationContext(), response);
+                        //fixturesData = jsonToData.getFixtureFromJSON(getApplicationContext(), response);
+                        lastFixtures = jsonToData.getFixtureFromJSON(getApplicationContext(), response);
 
-                        Log.d("DEBUGDB", "Before insert: ");
+                        //Log.d("DEBUGDB", "Before insert: ");
 
-                        fixtureDao.insert(fixturesData);
-                        Log.d("DEBUGDB", "AFTERDB: ");
+                        //fixtureDao.insert(fixturesData);
 
-                        //Log.d("DEBUGDB", "Checking db: " + fixtureDao.findByLeagueId(getSharedPreferencesSelectedLeague()).get(0).getTeamName());
+                        //Log.d("DEBUGDB", "AFTERDB: ");
 
-                        lastDBRefresh = System.currentTimeMillis();
-                        writeSharedPreferencesDBRefresh(lastDBRefresh, "FIXTURE", getSharedPreferencesSelectedLeague());
+                        //lastDBRefresh = System.currentTimeMillis();
+                        //writeSharedPreferencesDBRefresh(lastDBRefresh, "FIXTURE", getSharedPreferencesSelectedLeague());
 
-                        //construct and add recyclerView data, need to move this out of here will probably slow app?
-                        RecyclerView recyclerView = findViewById(R.id.rv_LeagueTable);
+                        /*//construct and add recyclerView data, need to move this out of here will probably slow app?
+                        RecyclerView recyclerView = findViewById(R.id.rv_FixtureTable);
                         RecyclerView.Adapter adapter = new FixtureRecyclerViewAdapter(getApplicationContext(), fixturesData, fa);
                         recyclerView.setAdapter(adapter);
-                        recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+                        recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));*/
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        }
+        ) {
+            //have to override getHeaders() method to pass the api key with StringRequest
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("x-rapidapi-key", "e5279c018911db9fe82d1a151043cb31");
+                return params;
+            }
+        };
+        StringRequest stringRequestNext = new StringRequest(Request.Method.GET, getNextFixturesURL(selectedLeague),
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        // Display the first 500 characters of the response string.
+                        Log.d(TAG, "onResponse: " + response);
+
+                        //call getLeagueFromJSON and parse the response to a new league list object
+                        JsonToDataTask jsonToData = new JsonToDataTask();
+                        //fixturesData = jsonToData.getFixtureFromJSON(getApplicationContext(), response);
+                        nextFixtures = jsonToData.getFixtureFromJSON(getApplicationContext(), response);
+
+                        //Log.d("DEBUGDB", "Before insert: ");
+
+                        //fixtureDao.insert(fixturesData);
+
+                        //Log.d("DEBUGDB", "AFTERDB: ");
+
+                        //lastDBRefresh = System.currentTimeMillis();
+                        //writeSharedPreferencesDBRefresh(lastDBRefresh, "FIXTURE", getSharedPreferencesSelectedLeague());
+
+                        /*//construct and add recyclerView data, need to move this out of here will probably slow app?
+                        RecyclerView recyclerView = findViewById(R.id.rv_FixtureTable);
+                        RecyclerView.Adapter adapter = new FixtureRecyclerViewAdapter(getApplicationContext(), fixturesData, fa);
+                        recyclerView.setAdapter(adapter);
+                        recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));*/
                     }
                 }, new Response.ErrorListener() {
             @Override
@@ -136,11 +181,50 @@ public class FixturesActivity extends ActivityBase {
             }
         };
         // Add the request to the RequestQueue.
-        queue.add(stringRequest);
+        queue.addRequestFinishedListener(new RequestQueue.RequestFinishedListener<Object>() {
+            @Override
+            public void onRequestFinished(Request<Object> request) {
+                Log.d("DEBUGDB", "onRequestFinished: ");
+                if(nextFixtures != null && lastFixtures != null){
+                    Log.d("DEBUGDB", "onRequestFinished: both not null");
+
+                    //lastFixtures.sort();
+                    //Collections.reverse(lastFixtures);
+                    fixturesData.addAll(lastFixtures);
+                    fixturesData.addAll(nextFixtures);
+
+                    fixturesData.sort(new SortByTime());
+
+                    fixtureDao.insert(fixturesData);
+
+                    Log.d("DEBUGDB", "AFTERDB: ");
+
+                    lastDBRefresh = System.currentTimeMillis();
+                    writeSharedPreferencesDBRefresh(lastDBRefresh, "FIXTURE", getSharedPreferencesSelectedLeague());
+
+                    //construct and add recyclerView data, need to move this out of here will probably slow app?
+                    RecyclerView recyclerView = findViewById(R.id.rv_FixtureTable);
+                    RecyclerView.Adapter adapter = new FixtureRecyclerViewAdapter(getApplicationContext(), fixturesData, fa);
+                    recyclerView.setAdapter(adapter);
+                    recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+                }
+
+
+            }
+        });
+
+        queue.add(stringRequestLast);
+        queue.add(stringRequestNext);
     }
 
-    public String getLeagueURL(String id) {
-        return "https://v2.api-football.com/leagueTable/" + id;
+    public String getLastFixturesURL(String id) {
+        //TODO get timezone from phone
+        return "https://v2.api-football.com/fixtures/league/" + id + "/last/20?timezone=Europe/London";
+    }
+
+    public String getNextFixturesURL(String id) {
+        //TODO get timezone from phone
+        return "https://v2.api-football.com/fixtures/league/" + id + "/next/20?timezone=Europe/London";
     }
 
     public void switchToEvents() {
@@ -149,23 +233,11 @@ public class FixturesActivity extends ActivityBase {
         //intent.putExtra("FROM_ACTIVITY", from); //can pass vars in bundle, useful later? pass the ref to DB
         startActivity(intent); //start activity via context that called it
     }
-
-    //returns some test data
-    public List<FixtureData> getTestData() {
-        List<FixtureData> dl = new ArrayList<>();
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
-        LocalDateTime d = LocalDateTime.now();
-        dl.add(new FixtureData("Man U", "Arbroath", getBadgeForTeam(this, 0), getBadgeForTeam(this, 0), 1, 5, d, 1));
-        dl.add(new FixtureData("Man U", "Arbroath", getBadgeForTeam(this, 0), getBadgeForTeam(this, 0), 1, 5, d, 2));
-        dl.add(new FixtureData("Man U", "Arbroath", getBadgeForTeam(this, 0), getBadgeForTeam(this, 0), 1, 5, d, 2));
-        dl.add(new FixtureData("Man U", "Arbroath", getBadgeForTeam(this, 0), getBadgeForTeam(this, 0), 1, 5, d, 2));
-        dl.add(new FixtureData("Man U", "Arbroath", getBadgeForTeam(this, 0), getBadgeForTeam(this, 0), 1, 5, d, 2));
-        dl.add(new FixtureData("Man U", "Arbroath", getBadgeForTeam(this, 0), getBadgeForTeam(this, 0), 1, 5, d, 2));
-        dl.add(new FixtureData("Man U", "Arbroath", getBadgeForTeam(this, 0), getBadgeForTeam(this, 0), 1, 5, d, 2));
-        dl.add(new FixtureData("Man U", "Arbroath", getBadgeForTeam(this, 0), getBadgeForTeam(this, 0), 1, 5, d, 2));
-        dl.add(new FixtureData("Man U", "Arbroath", getBadgeForTeam(this, 0), getBadgeForTeam(this, 0), 1, 5, d, 2));
-        dl.add(new FixtureData("Man U", "Arbroath", getBadgeForTeam(this, 0), getBadgeForTeam(this, 0), 1, 5, d, 2));
-        dl.add(new FixtureData("Man U", "Arbroath", getBadgeForTeam(this, 0), getBadgeForTeam(this, 0), 1, 5, d, 2));
-        return dl;
+    public class SortByTime implements Comparator<FixtureData>
+    {
+        @Override
+        public int compare(FixtureData o1, FixtureData o2) {
+            return o1.getDateTime().compareTo(o2.getDateTime());
+        }
     }
 }

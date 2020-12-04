@@ -1,18 +1,29 @@
 package uk.ash.womensfootball;
 
 import android.graphics.drawable.Drawable;
+import android.util.Log;
 
 import androidx.room.TypeConverter;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.TimeZone;
 
 
 public class Converters {
 
     @TypeConverter
-    public static Date fromTimestamp(Long value){
-        return value == null ? null : new Date(value);
+    public static LocalDateTime ldtFromLong(Long value){
+        return LocalDateTime.ofInstant(Instant.ofEpochSecond(value), ZoneId.systemDefault());
+    }
+
+    @TypeConverter
+    public static Long longFromLdt(LocalDateTime ldt){
+        return ldt.atZone(ZoneId.systemDefault()).toEpochSecond();
     }
 
     //@TypeConverter

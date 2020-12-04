@@ -25,8 +25,7 @@ public class ActivityBase extends AppCompatActivity {
 
     protected static String TAG = "DebugTag";
     //custom date/time pattern
-    //protected static DateTimeFormatter TIME_PATTERN = DateTimeFormatter.ofPattern("d LLL yy 'Kickoff' hh:mm a");
-    public static DateTimeFormatter TIME_PATTERN = DateTimeFormatter.ofPattern("d LLL 'Kickoff' hh:mm a");
+    public static DateTimeFormatter TIME_PATTERN = DateTimeFormatter.ofPattern("d LLL 'Kickoff' HH:mm");
     protected static SharedPreferences sharedPreferences;
 
     @Override
