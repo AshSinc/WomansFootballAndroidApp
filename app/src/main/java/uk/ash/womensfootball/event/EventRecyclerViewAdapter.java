@@ -11,6 +11,8 @@ import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.List;
+
 import uk.ash.womensfootball.R;
 
 public class EventRecyclerViewAdapter extends RecyclerView.Adapter<EventRecyclerViewAdapter.EventViewHolder> {
@@ -19,9 +21,9 @@ public class EventRecyclerViewAdapter extends RecyclerView.Adapter<EventRecycler
     private Context context;
 
     //league data to be displayed
-    private EventData data;
+    private List<EventData> data;
 
-    public EventRecyclerViewAdapter(Context c, EventData d){
+    public EventRecyclerViewAdapter(Context c, List<EventData> d){
         context = c;
         data = d;
     }
@@ -37,10 +39,10 @@ public class EventRecyclerViewAdapter extends RecyclerView.Adapter<EventRecycler
     @Override
     public void onBindViewHolder(@NonNull EventViewHolder holder, int pos) {
         //get data of table at position
-        EventData.EventsItem eventsItem = data.getEventsList().get(pos);
+        EventData eventsItem = data.get(pos);
         //update the Views
         if (eventsItem.away){
-            ((ImageView)holder.dataItemView.findViewById(R.id.iv_eventIconA)).setForeground(eventsItem.eventDrawable);
+            //((ImageView)holder.dataItemView.findViewById(R.id.iv_eventIconA)).setForeground(eventsItem.eventDrawable); TODO gete
             ((TextView)holder.dataItemView.findViewById(R.id.tv_descriptionA)).setText(String.valueOf(eventsItem.description));
             ((TextView)holder.dataItemView.findViewById(R.id.tv_eventTimeA)).setText(String.valueOf(eventsItem.time));
             //set home texts to null and Icon to transparent so recycler doesn't show repeated values
@@ -49,7 +51,7 @@ public class EventRecyclerViewAdapter extends RecyclerView.Adapter<EventRecycler
             ((TextView)holder.dataItemView.findViewById(R.id.tv_eventTimeH)).setText(null);
         }
         else{
-            ((ImageView)holder.dataItemView.findViewById(R.id.iv_eventIconH)).setForeground(eventsItem.eventDrawable);
+            //((ImageView)holder.dataItemView.findViewById(R.id.iv_eventIconH)).setForeground(eventsItem.eventDrawable); TODO gete
             ((TextView)holder.dataItemView.findViewById(R.id.tv_descriptionH)).setText(String.valueOf(eventsItem.description));
             ((TextView)holder.dataItemView.findViewById(R.id.tv_eventTimeH)).setText(String.valueOf(eventsItem.time));
             //set away texts to null so recycler doesn't show repeated values
@@ -62,7 +64,10 @@ public class EventRecyclerViewAdapter extends RecyclerView.Adapter<EventRecycler
 
     @Override
     public int getItemCount() {
-        return data.getEventsList().size();
+        if(data == null)
+            return 0;
+        else
+            return data.size();
     }
 
     //sits between adapter and the View that's displaying the item, captures clicks

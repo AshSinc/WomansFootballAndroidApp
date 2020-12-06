@@ -1,103 +1,69 @@
 package uk.ash.womensfootball.event;
 
 import android.graphics.drawable.Drawable;
+import android.location.Location;
+
+import androidx.annotation.NonNull;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 //basic class to hold and retrieve fixture data
+@Entity(tableName = "event_data")
 public class EventData {
-    private boolean inProgress; //stores if game is in progress or complete...... not needed maybe
-    private String teamNameH;
-    private String teamNameA;
-    private Drawable badgeH; //home team logo
-    private Drawable badgeA; //away team logo
-    private int homeScore;
-    private int awayScore;
-    private LocalDateTime dateTime;
-    //holds the timeline of events
-    private List<EventsItem> eventsList;
 
-    public EventData(String nH, String nA, Drawable dH, Drawable dA, int hS, int aS, LocalDateTime dT, List<EventsItem> eL) {
-        teamNameH = nH;
-        teamNameA = nA;
-        badgeH = dH;
-        badgeA = dA;
-        homeScore = hS;
-        awayScore = aS;
-        dateTime = dT;
-        eventsList = eL;
-    }
+    @NonNull
+    @PrimaryKey(autoGenerate = true) //TODO check this isn't generating duplicate entries in DB
+    public int id;
 
-    //an eventItem tracks each individual event
-    public static class EventsItem {
-        public boolean away; //tracks if home or away
-        public int time; //stores time of event in minutes
-        public int eventID; //eg. goal = 1, yellow = 2, will be used to fetch icon paths
-        public String description; //the text description of event
-        public Drawable eventDrawable; //the Drawable to be displayed for this event
+    public String eventType; //
 
-        public EventsItem(boolean a, int t, int id, String desc, Drawable d) {
-            away = a;
-            time = t;
-            eventID = id;
-            description = desc;
-            eventDrawable = d;
-        }
+    private int fixtureId; //fixture id from Fixtures API
+
+    public boolean away; //tracks if home or away
+    public int time; //stores time of event in minutes
+
+    public String description; //the text description of event
+
+    public static long updateTime;
+
+    //public EventData(int fixtureId, String teamNameH, String teamNameA, int homeScore, int awayScore, LocalDateTime dateTime, List<EventsItem> eventsList, boolean gameComplete) {
+    public EventData(String eventType, int fixtureId, boolean away, int time, String description) {
+        this.eventType = eventType; //eg. goal = 1, yellow = 2, will be used to fetch icon paths
+        this.fixtureId = fixtureId;
+        this.away = away; //tracks if home or away
+        this.time = time; //stores time of event in minutes
+        this.description = description; //the text description of event
     }
 
-    //getters
-    public String getTeamNameH() {
-        return teamNameH;
-    }
-    public String getTeamNameA() {
-        return teamNameA;
-    }
-    public Drawable getBadgeH() {
-        return badgeH;
-    }
-    public Drawable getBadgeA() {
-        return badgeA;
-    }
-    public int getHomeScore() {
-        return homeScore;
-    }
-    public int getAwayScore() {
-        return awayScore;
-    }
-    public LocalDateTime getDateTime() {
-        return dateTime;
-    }
-    public List<EventsItem> getEventsList() {
-        return eventsList;
+    public String getEventType(){
+        return eventType;
     }
 
-    //setters - possibly not needed, except maybe add/set eventList
-    public void setTeamNameA(String n) {
-        teamNameA = n;
+    public int getFixtureId(){
+        return fixtureId;
     }
-    public void setTeamNameH(String n) {
-        teamNameH = n;
+
+    public boolean getAway(){
+        return away;
     }
-    public void setBadgeH(Drawable p) {
-        badgeH = p;
+
+    public int getTime(){
+        return time;
     }
-    public void setBadgeA(Drawable p) {
-        badgeA = p;
+
+    public String getDescription(){
+        return description;
     }
-    public void setHomeScore(int s) {
-        homeScore = s;
+
+    public long getLongUpdateTime(){
+        return updateTime;
     }
-    public void setAwayScore(int s) {
-        awayScore = s;
+
+    public void setLongUpdateTime(long l){
+        updateTime = l;
     }
-    public void setDateTime(LocalDateTime d) {
-        dateTime = d;
-    }
-    public void setEventsList(List<EventsItem> el) {
-        eventsList = el;
-    }
-    public void addEventItem(EventsItem i) {
-        eventsList.add(i);
-    }
+
 }

@@ -59,7 +59,10 @@ public class FixtureRecyclerViewAdapter extends RecyclerView.Adapter<FixtureRecy
 
     @Override
     public int getItemCount() {
-        return data.size();
+        if(data == null)
+            return 0;
+        else
+            return data.size();
     }
 
     //sits between adapter and the View that's displaying the item, captures clicks
@@ -77,15 +80,9 @@ public class FixtureRecyclerViewAdapter extends RecyclerView.Adapter<FixtureRecy
         @Override
         public void onClick(View view) {
             int pos = getAdapterPosition(); //get clicked item pos
-
-            Log.d("DEBUG", "onClick: " + pos + " is team - " + data.get(pos).getTeamNameA());
-
-            //get team name from data at that pos.
-            //data.get(pos).getTeamName();
-            //then switch to fixtures and show only those upcoming games
-
+            Log.d("DEBUG", "onClick: " + pos + " is fixtureID - " + data.get(pos).getFixtureId());
+            //fixturesActivity.switchToEvents(data.get(pos).getFixtureId());
             fixturesActivity.switchToEvents();
-
         }
     }
 }

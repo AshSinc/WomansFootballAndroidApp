@@ -11,7 +11,7 @@ import androidx.room.PrimaryKey;
 public class LeagueData {
 
     @NonNull
-    @PrimaryKey(autoGenerate = false)
+    @PrimaryKey
     private String uid;
 
     private String leagueId; //league name

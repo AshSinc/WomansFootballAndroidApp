@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 import uk.ash.womensfootball.ActivityBase;
+import uk.ash.womensfootball.Converters;
 import uk.ash.womensfootball.JsonToDataTask;
 import uk.ash.womensfootball.R;
 import uk.ash.womensfootball.event.EventsActivity;
@@ -37,8 +38,6 @@ public class FixturesActivity extends ActivityBase {
     private List<FixtureData> nextFixtures;
     private String selectedLeague = "2745";
     private FixtureDao fixtureDao;
-    private long lastDBRefresh;
-    private long MIN_AGE = 600000; //milliseconds, 60,000 in 1 minute
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +58,8 @@ public class FixturesActivity extends ActivityBase {
             fixtureDao = db.fixtureDao();
         }
 
+        fixturesData = new ArrayList<>();
+
         selectedLeague = getSharedPreferencesSelectedLeague();
 
         // TODO
@@ -66,8 +67,14 @@ public class FixturesActivity extends ActivityBase {
 
         boolean shouldRefreshData = false;
         //check time of last refresh
-        Long now = System.currentTimeMillis();
-        if (now - getSharedPreferencesLastUpdate("FIXTURE", selectedLeague) > MIN_AGE) {
+        Long now = System.currentTimeMillis()/1000; //system time in seconds
+        Log.d("DEBUGDB", now + " now compareTo() + " + getSharedPreferencesLastUpdate("FIXTURE", selectedLeague));
+        Log.d("DEBUGDB", "" + now.compareTo(getSharedPreferencesLastUpdate("FIXTURE", selectedLeague)));
+
+        //if(true)
+        //    return;
+        if (now.compareTo(getSharedPreferencesLastUpdate("FIXTURE", selectedLeague)) > 0) {
+        //if (now - getSharedPreferencesLastUpdate("FIXTURE", selectedLeague) > MIN_AGE) {
             Log.d("DEBUGDB", "DB is old should refresh");
             shouldRefreshData = true;
         } else {
@@ -78,10 +85,11 @@ public class FixturesActivity extends ActivityBase {
             } else
                 shouldRefreshData = true;
         }
-
+        shouldRefreshData = false; //TODO remove
         if (shouldRefreshData) {
             requestFixtureUpdate();
         } else {
+            fixturesData.sort(new SortByTime());
             RecyclerView recyclerView = findViewById(R.id.rv_FixtureTable);
             RecyclerView.Adapter adapter = new FixtureRecyclerViewAdapter(getApplicationContext(), fixturesData, this);
             recyclerView.setAdapter(adapter);
@@ -90,11 +98,11 @@ public class FixturesActivity extends ActivityBase {
     }
 
     public void requestFixtureUpdate() {
+        lastFixtures = null;
+        nextFixtures = null;
+        fixturesData = new ArrayList<>();
         //send Volley request to url
         RequestQueue queue = Volley.newRequestQueue(this);
-
-
-
         FixturesActivity fa = this; //passing through to recycler view adapter, so we can navigate from Fixture to Event view
         StringRequest stringRequestLast = new StringRequest(Request.Method.GET, getLastFixturesURL(selectedLeague),
                 new Response.Listener<String>() {
@@ -102,26 +110,9 @@ public class FixturesActivity extends ActivityBase {
                     public void onResponse(String response) {
                         // Display the first 500 characters of the response string.
                         Log.d(TAG, "onResponse: " + response);
-
                         //call getLeagueFromJSON and parse the response to a new league list object
                         JsonToDataTask jsonToData = new JsonToDataTask();
-                        //fixturesData = jsonToData.getFixtureFromJSON(getApplicationContext(), response);
                         lastFixtures = jsonToData.getFixtureFromJSON(getApplicationContext(), response);
-
-                        //Log.d("DEBUGDB", "Before insert: ");
-
-                        //fixtureDao.insert(fixturesData);
-
-                        //Log.d("DEBUGDB", "AFTERDB: ");
-
-                        //lastDBRefresh = System.currentTimeMillis();
-                        //writeSharedPreferencesDBRefresh(lastDBRefresh, "FIXTURE", getSharedPreferencesSelectedLeague());
-
-                        /*//construct and add recyclerView data, need to move this out of here will probably slow app?
-                        RecyclerView recyclerView = findViewById(R.id.rv_FixtureTable);
-                        RecyclerView.Adapter adapter = new FixtureRecyclerViewAdapter(getApplicationContext(), fixturesData, fa);
-                        recyclerView.setAdapter(adapter);
-                        recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));*/
                     }
                 }, new Response.ErrorListener() {
             @Override
@@ -147,23 +138,7 @@ public class FixturesActivity extends ActivityBase {
 
                         //call getLeagueFromJSON and parse the response to a new league list object
                         JsonToDataTask jsonToData = new JsonToDataTask();
-                        //fixturesData = jsonToData.getFixtureFromJSON(getApplicationContext(), response);
                         nextFixtures = jsonToData.getFixtureFromJSON(getApplicationContext(), response);
-
-                        //Log.d("DEBUGDB", "Before insert: ");
-
-                        //fixtureDao.insert(fixturesData);
-
-                        //Log.d("DEBUGDB", "AFTERDB: ");
-
-                        //lastDBRefresh = System.currentTimeMillis();
-                        //writeSharedPreferencesDBRefresh(lastDBRefresh, "FIXTURE", getSharedPreferencesSelectedLeague());
-
-                        /*//construct and add recyclerView data, need to move this out of here will probably slow app?
-                        RecyclerView recyclerView = findViewById(R.id.rv_FixtureTable);
-                        RecyclerView.Adapter adapter = new FixtureRecyclerViewAdapter(getApplicationContext(), fixturesData, fa);
-                        recyclerView.setAdapter(adapter);
-                        recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));*/
                     }
                 }, new Response.ErrorListener() {
             @Override
@@ -184,32 +159,37 @@ public class FixturesActivity extends ActivityBase {
         queue.addRequestFinishedListener(new RequestQueue.RequestFinishedListener<Object>() {
             @Override
             public void onRequestFinished(Request<Object> request) {
-                Log.d("DEBUGDB", "onRequestFinished: ");
                 if(nextFixtures != null && lastFixtures != null){
                     Log.d("DEBUGDB", "onRequestFinished: both not null");
 
-                    //lastFixtures.sort();
-                    //Collections.reverse(lastFixtures);
+                    lastFixtures.sort(new SortByTime());
+                    nextFixtures.sort(new SortByTime());
+                    // set next fixture refresh for 100 minutes after the start of the next game
+                    //not ideal but workaround for API restrictions for now
+                    long nextFixtureRefresh = System.currentTimeMillis()+86400000; //set default to a day later, would only be used at end of season if there are no upcoming games
+                    if(!nextFixtures.isEmpty())
+                        nextFixtureRefresh = Converters.longFromLdt(nextFixtures.get(0).getDateTime().plusMinutes(100));
+
+                    Log.d("DEBUGDB", "Next Expected end of game: " + nextFixtureRefresh);
+
                     fixturesData.addAll(lastFixtures);
                     fixturesData.addAll(nextFixtures);
 
-                    fixturesData.sort(new SortByTime());
-
+                    fixtureDao.clearTable();
                     fixtureDao.insert(fixturesData);
 
-                    Log.d("DEBUGDB", "AFTERDB: ");
+                    writeSharedPreferencesDBRefresh(nextFixtureRefresh, "FIXTURE", getSharedPreferencesSelectedLeague());
 
-                    lastDBRefresh = System.currentTimeMillis();
-                    writeSharedPreferencesDBRefresh(lastDBRefresh, "FIXTURE", getSharedPreferencesSelectedLeague());
-
-                    //construct and add recyclerView data, need to move this out of here will probably slow app?
+                    //construct and add recyclerView data
                     RecyclerView recyclerView = findViewById(R.id.rv_FixtureTable);
                     RecyclerView.Adapter adapter = new FixtureRecyclerViewAdapter(getApplicationContext(), fixturesData, fa);
                     recyclerView.setAdapter(adapter);
                     recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+
+                    //set to null again to be safe
+                    lastFixtures=null;
+                    nextFixtures=null;
                 }
-
-
             }
         });
 
@@ -227,10 +207,21 @@ public class FixturesActivity extends ActivityBase {
         return "https://v2.api-football.com/fixtures/league/" + id + "/next/20?timezone=Europe/London";
     }
 
+    //public void switchToEvents(int fixtureId) {
     public void switchToEvents() {
         Intent intent = new Intent(this, EventsActivity.class); //Intent, the activity we want to switch to
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION); //stops animation on switching activity, stops annoying flicker
-        //intent.putExtra("FROM_ACTIVITY", from); //can pass vars in bundle, useful later? pass the ref to DB
+        /*intent.putExtra("FIXTURE_ID", fixtureId);
+        FixtureData fixture = fixtureDao.findFixtureById(fixtureId); //get Fixture data from database by fixture id
+        intent.putExtra("HOME_TEAM_NAME", fixture.getTeamNameH());
+        intent.putExtra("AWAY_TEAM_NAME", fixture.getTeamNameA());
+        intent.putExtra("HOME_TEAM_ID", fixture.getTeamIdH());
+        intent.putExtra("AWAY_TEAM_ID", fixture.getTeamIdA());
+        intent.putExtra("HOME_SCORE", fixture.getHomeScore());
+        intent.putExtra("AWAY_SCORE", fixture.getAwayScore());
+        intent.putExtra("IS_COMPLETE", fixture.getGameComplete());
+        intent.putExtra("LONG_TIME", Converters.longFromLdt(fixture.getDateTime()));*/
+        //intent.putExtra("UPDATE_TIME", Converters.longFromLdt(fixture.getDateTime()));
         startActivity(intent); //start activity via context that called it
     }
     public class SortByTime implements Comparator<FixtureData>

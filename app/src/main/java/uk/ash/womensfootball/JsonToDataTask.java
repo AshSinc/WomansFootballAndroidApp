@@ -12,6 +12,7 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
+import uk.ash.womensfootball.event.EventData;
 import uk.ash.womensfootball.fixture.FixtureData;
 import uk.ash.womensfootball.league.LeagueData;
 
@@ -60,18 +61,22 @@ public class JsonToDataTask {
             Integer homeScore = 0, awayScore = 0;
             String teamNameH, teamNameA;
             LocalDateTime dateTime;
+            boolean gameComplete = false;
 
             for (int x = 0; x < fixturesJsonArray.length(); x++) {
                 //loop through each fixture entry and extract data
                 JSONObject fixtureJsonObj = fixturesJsonArray.getJSONObject(x);
+                Log.d("each event  ", fixtureJsonObj.toString());
                 fixtureId = fixtureJsonObj.getInt("fixture_id");
                 leagueId = fixtureJsonObj.getInt("league_id");
+                gameComplete = (fixtureJsonObj.getString("statusShort") == "FT"); //TODO doesnt handle matches that are cancelled or postponed etc
                 JSONObject homeTeamObj = fixtureJsonObj.getJSONObject("homeTeam");
                 teamIdH = homeTeamObj.getInt("team_id");
                 teamNameH = homeTeamObj.getString("team_name");
                 JSONObject awayTeamObj = fixtureJsonObj.getJSONObject("awayTeam");
                 teamIdA = awayTeamObj.getInt("team_id");
                 teamNameA = awayTeamObj.getString("team_name");
+
 
                 try {
                     homeScore = fixtureJsonObj.getInt("goalsHomeTeam");
@@ -83,7 +88,7 @@ public class JsonToDataTask {
                 dateTime = Converters.ldtFromLong(fixtureJsonObj.getLong("event_timestamp"));
 
                 //add to league list for return
-                fixture.add(new FixtureData(fixtureId, leagueId, teamNameH, teamNameA, homeScore, awayScore, dateTime, teamIdH, teamIdA));
+                fixture.add(new FixtureData(fixtureId, leagueId, teamNameH, teamNameA, homeScore, awayScore, dateTime, teamIdH, teamIdA, gameComplete));
             }
             Log.d("JSON TO FIXTURE TASK", "getFixtureFromJSON: " + fixture);
             return fixture;
@@ -91,6 +96,70 @@ public class JsonToDataTask {
             Log.d("getFixtureFromJSON ", e.toString());
             return null;
         }
+    }
+
+    public List<EventData> getEventFromJSON(Context context, String jsonString, int fixtureId, int homeTeamId) {
+        List<EventData> events = new ArrayList<>();
+        try {
+            JSONObject jsonObj = new JSONObject(jsonString);
+            Log.d("EVENTS", "getEventFromJSON: " + jsonObj.toString());
+            //TODO {"api":{"results":0,"error":"You have reached the request limit for the day"}}
+            //get the events array
+            JSONArray eventsJsonObj = jsonObj.getJSONObject("api").getJSONArray("events");
+            for (int x = 0; x < eventsJsonObj.length(); x++) {
+                boolean away; //tracks if home or away
+                if(homeTeamId == eventsJsonObj.getJSONObject(x).getInt("team_id"))
+                    away = false;
+                else
+                    away = true;
+
+                int time = eventsJsonObj.getJSONObject(x).getInt("elapsed"); //stores time of event in minutes
+                String type = eventsJsonObj.getJSONObject(x).getString("type");
+                String player = eventsJsonObj.getJSONObject(x).getString("player");
+                String detail = eventsJsonObj.getJSONObject(x).getString("detail");
+                String[] typeAndDescription = getTypeAndDescOfEvent(type, player, detail);
+                events.add(new EventData(typeAndDescription[0],fixtureId,away,time,typeAndDescription[1]));
+            }
+            return events;
+        } catch (Exception e) {
+            Log.d("getLeagueFromJSON ", e.toString());
+            return null;
+        }
+    }
+
+    public String[] getTypeAndDescOfEvent(String type, String player, String detail){
+        String[] returnStringArray = new String[2];
+
+        if(type.matches("Goal")) {
+            if (detail.matches("Missed Penalty")) {
+                returnStringArray[0] = "Miss";
+                returnStringArray[1] = player + " missed a penalty!";
+            }
+            else if (detail.matches("Normal Goal")) {
+                returnStringArray[0] = "Goal";
+                returnStringArray[1] = player + " scored!";
+            }
+            else if (detail.matches("Penalty")) {
+                returnStringArray[0] = "Goal";
+                returnStringArray[1] = player + " scored a penalty";
+            }
+        }
+        else if(type.matches("subst")) {
+            returnStringArray[0] = "Sub";
+            returnStringArray[1] = player + " subbed for " + detail;
+        }
+        else if(type.matches("Card")){
+            if (detail.matches("Yellow Card")) {
+                returnStringArray[0] = "Yellow";
+                returnStringArray[1] = player + " given a Yellow";
+            }
+            else if (detail.matches("Red Card")) {
+                returnStringArray[0] = "Red";
+                returnStringArray[1] = player + " given a Red!";
+            }
+        }
+
+        return returnStringArray;
     }
 }
 

@@ -25,7 +25,8 @@ public class ActivityBase extends AppCompatActivity {
 
     protected static String TAG = "DebugTag";
     //custom date/time pattern
-    public static DateTimeFormatter TIME_PATTERN = DateTimeFormatter.ofPattern("d LLL 'Kickoff' HH:mm");
+    //public static DateTimeFormatter TIME_PATTERN = DateTimeFormatter.ofPattern("d LLL 'Kickoff' HH:mm");
+    public static DateTimeFormatter TIME_PATTERN = DateTimeFormatter.ofPattern("d LLL YY 'Kickoff' HH:mm");
     protected static SharedPreferences sharedPreferences;
 
     @Override
@@ -107,7 +108,7 @@ public class ActivityBase extends AppCompatActivity {
                 prefId = R.string.shared_pref_fixture_2745_update;
             }
         }
-        Log.d(TAG, "getPreferenceStringFor: " + activityName + " " + id + " = " + prefId);
+        //Log.d(TAG, "getPreferenceStringFor: " + activityName + " " + id + " = " + prefId);
         return prefId;
     }
 
@@ -117,7 +118,8 @@ public class ActivityBase extends AppCompatActivity {
     }
 
     protected void writeSharedPreferencesDBRefresh(long lastUpdate, String activityName, String id) {
-        int prefId = getPreferenceIdFor(activityName, id);
+        Log.d(TAG, "writeSharedPreferencesDBRefresh: " + lastUpdate + activityName + id );
+        int prefId = getPreferenceIdFor(activityName, id); //TODO what was i doing in there? Why does that work 0o
 
         if(prefId == -1) {
             Log.d(TAG, "writeSharedPreferencesDBRefresh: Not saving prefId is -1");

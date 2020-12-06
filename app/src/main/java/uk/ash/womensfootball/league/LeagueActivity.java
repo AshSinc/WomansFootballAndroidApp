@@ -27,10 +27,6 @@ public class LeagueActivity extends ActivityBase {
     private List<LeagueData> leagueData;
     private String selectedLeague = "2745";
     private LeagueDao leagueDao;
-    private long lastDBRefresh;// = System.currentTimeMillis();
-    private long MIN_AGE = 600000; //milliseconds, 60,000 in 1 minute
-    //MIN_AGE should be once per day?
-    //but tracking additional changes manually where possible?
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,55 +52,33 @@ public class LeagueActivity extends ActivityBase {
 
         boolean shouldRefreshData = false;
         //check time of last refresh
-        Long now = System.currentTimeMillis();
-        if(now - getSharedPreferencesLastUpdate("LEAGUE", selectedLeague) > MIN_AGE){
+        Long now = System.currentTimeMillis()/1000;
+
+        if(now.compareTo(getSharedPreferencesLastUpdate("FIXTURE", selectedLeague)) > 0){
+       //if(now - getSharedPreferencesLastUpdate("FIXTURE", selectedLeague) > MIN_AGE){
             Log.d("DEBUGDB", "DB is old should refresh");
             shouldRefreshData = true;
         }
         else{
             leagueData = leagueDao.findByLeagueId(selectedLeague);
             if (leagueData.size() > 0) {
-                Log.d("DEBUGDB", "Found " + leagueData.get(0));
+                //Log.d("DEBUGDB", "Found " + leagueData.get(0));
                 shouldRefreshData = false;
             }
             else
                 shouldRefreshData = true;
         }
-
+        shouldRefreshData = false; //TODO remove
         if (shouldRefreshData) {
             requestLeagueUpdate();
         } else {
-            Log.d("DEBUGDB", "Found " + leagueData.get(0).getTeamName());
+            //Log.d("DEBUGDB", "Found " + leagueData.get(0).getTeamName());
             RecyclerView recyclerView = findViewById(R.id.rv_LeagueTable);
             RecyclerView.Adapter adapter = new LeagueRecyclerViewAdapter(getApplicationContext(), leagueData);
             recyclerView.setAdapter(adapter);
             recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
         }
     }
-
-    /*private String getSharedPreferencesSelectedLeague(){
-        return sharedPreferences.getString(getString(R.string.shared_pref_league_id), new String("2745"));
-    }
-
-    private Long getSharedPreferencesLastUpdate(){
-        return sharedPreferences.getLong(getString(R.string.shared_pref_league_update), 0);
-    }*/
-
-    /*private void writeSharedPreferencesSelectedLeague(String leagueId){
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.remove(getString(R.string.shared_pref_league_id));
-        editor.apply();
-        editor.putString(getString(R.string.shared_pref_league_id), leagueId);
-        editor.apply();
-    }
-
-    private void writeSharedPreferencesDBRefresh(long time){
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.remove(getString(R.string.shared_pref_league_update));
-        editor.apply();
-        editor.putLong(getString(R.string.shared_pref_league_update), time);
-        editor.apply();
-    }*/
 
     public void requestLeagueUpdate() {
         //send Volley request to url
@@ -120,15 +94,12 @@ public class LeagueActivity extends ActivityBase {
                         JsonToDataTask jsonToData = new JsonToDataTask();
                         leagueData = jsonToData.getLeagueFromJSON(getApplicationContext(), response);
 
-                        Log.d("DEBUGDB", "Before insert: ");
-
                         leagueDao.insert(leagueData);
-                        Log.d("DEBUGDB", "AFTERDB: ");
 
-                        Log.d("DEBUGDB", "Checking db: " + leagueDao.findByLeagueId(getSharedPreferencesSelectedLeague()).get(0).getTeamName());
+                        Log.d("DEBUGDB", "Updated DB checking: " + leagueDao.findByLeagueId(getSharedPreferencesSelectedLeague()).get(0).getTeamName());
 
-                        lastDBRefresh = System.currentTimeMillis();
-                        writeSharedPreferencesDBRefresh(lastDBRefresh, "LEAGUE", getSharedPreferencesSelectedLeague());
+                        long nextDBRefresh = System.currentTimeMillis();
+                        writeSharedPreferencesDBRefresh(nextDBRefresh, "LEAGUE", getSharedPreferencesSelectedLeague());
 
                         //construct and add recyclerView data, need to move this out of here will probably slow app?
                         RecyclerView recyclerView = findViewById(R.id.rv_LeagueTable);
@@ -158,32 +129,4 @@ public class LeagueActivity extends ActivityBase {
     public String getLeagueURL(String id) {
         return "https://v2.api-football.com/leagueTable/" + id;
     }
-
-    /*@Override
-    protected void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-        Log.d(TAG, "App is saving instance bundle");
-        /*if (forecast != null) {
-            // need to add location name, minimum temperature, maximum temperature, date, weather for
-            // the forecast to the outState
-            outState.putString(LOCATION_NAME, forecast.getLocationName());
-            outState.putInt(MIN_TEMP, forecast.getMinTemp());
-            outState.putInt(MAX_TEMP, forecast.getMaxTemp());
-            outState.putString(DATE, forecast.getDate());
-            outState.putString(WEATHER, forecast.getWeather());
-        }
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        Log.d(TAG, "App is in onResume");
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        Log.d(TAG, "App is in onPause");
-        //updateSharedPreferencesWithFavouriteLocation();
-    }*/
 }

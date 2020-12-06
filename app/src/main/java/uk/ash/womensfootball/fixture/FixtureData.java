@@ -24,8 +24,10 @@ public class FixtureData {
     private LocalDateTime dateTime;
     private int teamIdH; //teamID from Api
     private int teamIdA; //teamID from Api
+    private boolean gameComplete;
+    private long nextEventUpdate = -1;
 
-    public FixtureData(int fixtureId, int leagueId, String teamNameH, String teamNameA, int homeScore, int awayScore, LocalDateTime dateTime, int teamIdH, int teamIdA){
+    public FixtureData(int fixtureId, int leagueId, String teamNameH, String teamNameA, int homeScore, int awayScore, LocalDateTime dateTime, int teamIdH, int teamIdA, boolean gameComplete){
         this.fixtureId = fixtureId;
         this.leagueId = leagueId;
         this.teamNameH = teamNameH;
@@ -35,6 +37,7 @@ public class FixtureData {
         this.dateTime = dateTime;
         this.teamIdH = teamIdH;
         this.teamIdA = teamIdA;
+        this.gameComplete = gameComplete;
     }
 
     //getters
@@ -67,6 +70,14 @@ public class FixtureData {
         return teamIdA;
     }
 
+    public boolean getGameComplete(){
+        return gameComplete;
+    }
+
+    public long getNextEventUpdate(){
+        return nextEventUpdate;
+    }
+
     //setters - probably don't need
     public void setTeamNameH(String n){
         teamNameH = n;
@@ -87,4 +98,7 @@ public class FixtureData {
         fixtureId = i;
     }
 
+    public void setNextEventUpdate(long l){
+        nextEventUpdate = l;
+    }
 }

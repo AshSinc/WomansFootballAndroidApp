@@ -58,7 +58,10 @@ public class LeagueRecyclerViewAdapter extends RecyclerView.Adapter<LeagueRecycl
 
     @Override
     public int getItemCount() {
-        return data.size();
+        if(data == null)
+            return 0;
+        else
+            return data.size();
     }
 
     //sits between adapter and the View that's displaying the item, captures clicks
