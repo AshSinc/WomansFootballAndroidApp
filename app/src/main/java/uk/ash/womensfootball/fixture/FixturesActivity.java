@@ -85,7 +85,8 @@ public class FixturesActivity extends ActivityBase {
             } else
                 shouldRefreshData = true;
         }
-        shouldRefreshData = false; //TODO remove
+        if(NEVER_UPDATE)
+            shouldRefreshData = false; //TODO remove
         if (shouldRefreshData) {
             requestFixtureUpdate();
         } else {
@@ -208,20 +209,10 @@ public class FixturesActivity extends ActivityBase {
     }
 
     //public void switchToEvents(int fixtureId) {
-    public void switchToEvents() {
+    public void switchToEvents(int fixtureId) {
         Intent intent = new Intent(this, EventsActivity.class); //Intent, the activity we want to switch to
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION); //stops animation on switching activity, stops annoying flicker
-        /*intent.putExtra("FIXTURE_ID", fixtureId);
-        FixtureData fixture = fixtureDao.findFixtureById(fixtureId); //get Fixture data from database by fixture id
-        intent.putExtra("HOME_TEAM_NAME", fixture.getTeamNameH());
-        intent.putExtra("AWAY_TEAM_NAME", fixture.getTeamNameA());
-        intent.putExtra("HOME_TEAM_ID", fixture.getTeamIdH());
-        intent.putExtra("AWAY_TEAM_ID", fixture.getTeamIdA());
-        intent.putExtra("HOME_SCORE", fixture.getHomeScore());
-        intent.putExtra("AWAY_SCORE", fixture.getAwayScore());
-        intent.putExtra("IS_COMPLETE", fixture.getGameComplete());
-        intent.putExtra("LONG_TIME", Converters.longFromLdt(fixture.getDateTime()));*/
-        //intent.putExtra("UPDATE_TIME", Converters.longFromLdt(fixture.getDateTime()));
+        intent.putExtra("FIXTURE_ID", fixtureId);
         startActivity(intent); //start activity via context that called it
     }
     public class SortByTime implements Comparator<FixtureData>

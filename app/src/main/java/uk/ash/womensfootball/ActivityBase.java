@@ -22,7 +22,7 @@ import uk.ash.womensfootball.league.LeagueActivity;
 
 //acts as a base class for the three Activity tabs
 public class ActivityBase extends AppCompatActivity {
-
+    protected static boolean NEVER_UPDATE = false;
     protected static String TAG = "DebugTag";
     //custom date/time pattern
     //public static DateTimeFormatter TIME_PATTERN = DateTimeFormatter.ofPattern("d LLL 'Kickoff' HH:mm");

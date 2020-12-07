@@ -42,7 +42,7 @@ public class EventRecyclerViewAdapter extends RecyclerView.Adapter<EventRecycler
         EventData eventsItem = data.get(pos);
         //update the Views
         if (eventsItem.away){
-            //((ImageView)holder.dataItemView.findViewById(R.id.iv_eventIconA)).setForeground(eventsItem.eventDrawable); TODO gete
+            ((ImageView)holder.dataItemView.findViewById(R.id.iv_eventIconA)).setForeground(EventsActivity.getDrawableForEvent(context,eventsItem.getEventType()));
             ((TextView)holder.dataItemView.findViewById(R.id.tv_descriptionA)).setText(String.valueOf(eventsItem.description));
             ((TextView)holder.dataItemView.findViewById(R.id.tv_eventTimeA)).setText(String.valueOf(eventsItem.time));
             //set home texts to null and Icon to transparent so recycler doesn't show repeated values
@@ -51,7 +51,7 @@ public class EventRecyclerViewAdapter extends RecyclerView.Adapter<EventRecycler
             ((TextView)holder.dataItemView.findViewById(R.id.tv_eventTimeH)).setText(null);
         }
         else{
-            //((ImageView)holder.dataItemView.findViewById(R.id.iv_eventIconH)).setForeground(eventsItem.eventDrawable); TODO gete
+            ((ImageView)holder.dataItemView.findViewById(R.id.iv_eventIconH)).setForeground(EventsActivity.getDrawableForEvent(context,eventsItem.getEventType()));
             ((TextView)holder.dataItemView.findViewById(R.id.tv_descriptionH)).setText(String.valueOf(eventsItem.description));
             ((TextView)holder.dataItemView.findViewById(R.id.tv_eventTimeH)).setText(String.valueOf(eventsItem.time));
             //set away texts to null so recycler doesn't show repeated values

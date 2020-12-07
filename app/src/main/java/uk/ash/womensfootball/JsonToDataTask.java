@@ -108,7 +108,7 @@ public class JsonToDataTask {
             JSONArray eventsJsonObj = jsonObj.getJSONObject("api").getJSONArray("events");
             for (int x = 0; x < eventsJsonObj.length(); x++) {
                 boolean away; //tracks if home or away
-                if(homeTeamId == eventsJsonObj.getJSONObject(x).getInt("team_id"))
+                if (homeTeamId == eventsJsonObj.getJSONObject(x).getInt("team_id"))
                     away = false;
                 else
                     away = true;
@@ -118,7 +118,7 @@ public class JsonToDataTask {
                 String player = eventsJsonObj.getJSONObject(x).getString("player");
                 String detail = eventsJsonObj.getJSONObject(x).getString("detail");
                 String[] typeAndDescription = getTypeAndDescOfEvent(type, player, detail);
-                events.add(new EventData(typeAndDescription[0],fixtureId,away,time,typeAndDescription[1]));
+                events.add(new EventData(typeAndDescription[0], fixtureId, away, time, typeAndDescription[1]));
             }
             return events;
         } catch (Exception e) {
@@ -127,36 +127,44 @@ public class JsonToDataTask {
         }
     }
 
-    public String[] getTypeAndDescOfEvent(String type, String player, String detail){
+    public String[] getTypeAndDescOfEvent(String type, String player, String detail) {
         String[] returnStringArray = new String[2];
 
-        if(type.matches("Goal")) {
+        if (type.matches("Goal")) {
             if (detail.matches("Missed Penalty")) {
                 returnStringArray[0] = "Miss";
                 returnStringArray[1] = player + " missed a penalty!";
-            }
-            else if (detail.matches("Normal Goal")) {
+            } else if (detail.matches("Normal Goal")) {
                 returnStringArray[0] = "Goal";
                 returnStringArray[1] = player + " scored!";
-            }
-            else if (detail.matches("Penalty")) {
+            } else if (detail.matches("Penalty")) {
                 returnStringArray[0] = "Goal";
                 returnStringArray[1] = player + " scored a penalty";
+            } else if (detail.matches("Own Goal")) {
+                returnStringArray[0] = "Goal";
+                returnStringArray[1] = player + " scored own Goal!";
+            } else { //if we dont know what it is, just add it raw
+                returnStringArray[0] = "Goal";
+                returnStringArray[1] = player + " " + detail;
             }
-        }
-        else if(type.matches("subst")) {
+        } else if (type.matches("subst")) {
             returnStringArray[0] = "Sub";
             returnStringArray[1] = player + " subbed for " + detail;
-        }
-        else if(type.matches("Card")){
+        } else if (type.matches("Card")) {
             if (detail.matches("Yellow Card")) {
                 returnStringArray[0] = "Yellow";
                 returnStringArray[1] = player + " given a Yellow";
-            }
-            else if (detail.matches("Red Card")) {
+            } else if (detail.matches("Red Card")) {
                 returnStringArray[0] = "Red";
                 returnStringArray[1] = player + " given a Red!";
+            } else {//if we dont know what it is, just add it raw
+                returnStringArray[0] = "Red";
+                returnStringArray[1] = player + " " + detail;
             }
+        }
+        else{ //if we dont know what it is, just add it raw
+            returnStringArray[0] = "Miss";
+            returnStringArray[1] = player + " " + detail;
         }
 
         return returnStringArray;

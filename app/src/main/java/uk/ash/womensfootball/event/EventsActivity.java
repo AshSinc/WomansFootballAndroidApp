@@ -1,5 +1,6 @@
 package uk.ash.womensfootball.event;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -65,39 +66,33 @@ public class EventsActivity extends ActivityBase {
             super.onCreate(savedInstanceState);
         }
 
-        //if (intent == null)
-        //    return; //TODO should give a fail message but for now this will do
+        if (intent == null)
+            return; //TODO should give a fail message but for now this will do, should never occur
 
-        /*fixtureID = intent.getIntExtra("FIXTURE_ID", -1);
-        homeTeamID = intent.getIntExtra("HOME_TEAM_ID", -1);
-        awayTeamID = intent.getIntExtra("AWAY_TEAM_ID", -1);
-        homeTeamScore = intent.getIntExtra("HOME_SCORE", -1);
-        awayTeamScore = intent.getIntExtra("AWAY_SCORE", -1);
-        homeTeamName = intent.getStringExtra("HOME_TEAM_NAME");
-        awayTeamName = intent.getStringExtra("AWAY_TEAM_NAME");
-        gameComplete = intent.getBooleanExtra("IS_COMPLETE", false);
-        kickoffTime = Converters.ldtFromLong(intent.getLongExtra("LONG_TIME", -1));*/
+        fixtureID = intent.getIntExtra("FIXTURE_ID", -1);
+
+        if(fixtureID == -1)
+            return; //TODO should give a fail message but for now this will do, should never occur
 
         synchronized (EventsActivity.class) {
             EventDatabase eventsDb = EventDatabase.getDatabase(this);
             eventDao = eventsDb.eventDao();
-        }
-        synchronized (FixturesActivity.class) {
             FixtureDatabase db = FixtureDatabase.getDatabase(this);
             fixtureDao = db.fixtureDao();
+            fixture = fixtureDao.findFixtureById(fixtureID);
         }
 
-        fixture = fixtureDao.findFixtureById(fixtureID);
-
-        fixtureID = fixture.getFixtureId();
-        homeTeamID = fixture.getTeamIdH();
-        awayTeamID = fixture.getTeamIdA();
-        homeTeamScore = fixture.getHomeScore();
-        awayTeamScore = fixture.getAwayScore();
-        homeTeamName = fixture.getTeamNameH();
-        awayTeamName = fixture.getTeamNameA();
-        gameComplete = fixture.getGameComplete();
-        kickoffTime = fixture.getDateTime();
+        if(fixture != null){
+            fixtureID = fixture.getFixtureId();
+            homeTeamID = fixture.getTeamIdH();
+            awayTeamID = fixture.getTeamIdA();
+            homeTeamScore = fixture.getHomeScore();
+            awayTeamScore = fixture.getAwayScore();
+            homeTeamName = fixture.getTeamNameH();
+            awayTeamName = fixture.getTeamNameA();
+            gameComplete = fixture.getGameComplete();
+            kickoffTime = fixture.getDateTime();
+        }
 
         //set the header info from savedInstanceState data
         ((TextView) findViewById(R.id.tv_time)).setText(kickoffTime.format(TIME_PATTERN));
@@ -111,8 +106,20 @@ public class EventsActivity extends ActivityBase {
         boolean shouldRefreshData = false;
         eventData = eventDao.findByFixtureId(fixtureID);
         if (eventData.isEmpty()) {
-            Log.d(TAG, "onCreate: eventData is empty, should refresh");
-            shouldRefreshData = true;
+            if (gameComplete) {
+                Log.d(TAG, "onCreate: game is over but we have no data, refresh");
+                shouldRefreshData = true;
+            }
+            else{
+                Long now = System.currentTimeMillis() / 1000; //system time in seconds
+                if (now.compareTo(Converters.longFromLdt(fixture.getDateTime())) > 0){ //TODO check this
+                    Log.d(TAG, "onCreate: eventData is empty and time is after game start, should refresh");
+                    shouldRefreshData = true;
+                }
+                else{
+                    Log.d(TAG, "onCreate: eventData is empty and time is before game start, no need to refresh");
+                }
+            }
         } else {
             Long now = System.currentTimeMillis() / 1000; //system time in seconds
             if (gameComplete) {
@@ -123,14 +130,10 @@ public class EventsActivity extends ActivityBase {
                 shouldRefreshData = true;
                 //TODO get last refresh time, need to save this in event, fixture would be better but much more awkward
             }
-            //else if(now - Converters.longFromLdt(eventData.get(0).getUpdateTime()) > MAX_AGE){
-            //    Log.d(TAG, "onCreate: game is over, dont refresh");
-            //    //TODO get last refresh time, need to save this in event, fixture would be better but much more awkward
-            //}
         }
 
-        shouldRefreshData = false; //TODO remove
-
+        if(NEVER_UPDATE)
+            shouldRefreshData = false; //TODO remove
         if (shouldRefreshData) {
             requestEventsUpdate();
         } else {
@@ -164,7 +167,9 @@ public class EventsActivity extends ActivityBase {
                         fixture.setNextEventUpdate(nextEventRefresh);
                         fixtureDao.update(fixture); //TODO check this is actually working
 
-                        Log.d("DEBUGDB", "Updated DB checking: " + eventDao.findByFixtureId(fixtureID).get(0).toString());
+                        //Log.d("DEBUGDB", "Updated DB checking: " + eventData.);
+
+                        //Log.d("DEBUGDB", "Updated DB checking: " + eventDao.findByFixtureId(fixtureID).get(0).toString());
 
                         //construct and add recyclerView data, need to move this out of here will probably slow app?
                         RecyclerView recyclerView = findViewById(R.id.rv_EventTable);
@@ -191,29 +196,29 @@ public class EventsActivity extends ActivityBase {
         queue.add(stringRequest);
     }
 
-    public Drawable getDrawableForEvent(int id) {
+    public static Drawable getDrawableForEvent(Context context, String type) {
         Drawable d;
-        switch (id) {
-            case (0):
-                d = ContextCompat.getDrawable(this, R.drawable.goal);
+        switch (type) {
+            case ("Goal"):
+                d = ContextCompat.getDrawable(context, R.drawable.goal);
                 break;
-            case (1):
-                d = ContextCompat.getDrawable(this, R.drawable.yellowcard);
+            case ("Yellow"):
+                d = ContextCompat.getDrawable(context, R.drawable.yellowcard);
                 break;
-            case (2):
-                d = ContextCompat.getDrawable(this, R.drawable.redcard);
+            case ("Red"):
+                d = ContextCompat.getDrawable(context, R.drawable.redcard);
                 break;
-            case (3):
-                d = null;
+            case ("Sub"):
+                d = ContextCompat.getDrawable(context, R.drawable.sub);
                 break;
-            case (4):
-                d = null;
+            case ("Miss"):
+                d = ContextCompat.getDrawable(context, R.drawable.miss);
                 break;
-            case (5):
-                d = null;
-                break;
+            //case (5):
+             //   d = null;
+             //   break;
             default:
-                d = ContextCompat.getDrawable(this, android.R.drawable.btn_star_big_on);
+                d = ContextCompat.getDrawable(context, android.R.drawable.btn_star_big_on);
         }
         return d;
     }

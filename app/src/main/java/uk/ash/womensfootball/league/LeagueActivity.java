@@ -55,24 +55,22 @@ public class LeagueActivity extends ActivityBase {
         Long now = System.currentTimeMillis()/1000;
 
         if(now.compareTo(getSharedPreferencesLastUpdate("FIXTURE", selectedLeague)) > 0){
-       //if(now - getSharedPreferencesLastUpdate("FIXTURE", selectedLeague) > MIN_AGE){
             Log.d("DEBUGDB", "DB is old should refresh");
             shouldRefreshData = true;
         }
         else{
             leagueData = leagueDao.findByLeagueId(selectedLeague);
             if (leagueData.size() > 0) {
-                //Log.d("DEBUGDB", "Found " + leagueData.get(0));
                 shouldRefreshData = false;
             }
             else
                 shouldRefreshData = true;
         }
-        shouldRefreshData = false; //TODO remove
+        if(NEVER_UPDATE)
+            shouldRefreshData = false; //TODO remove
         if (shouldRefreshData) {
             requestLeagueUpdate();
         } else {
-            //Log.d("DEBUGDB", "Found " + leagueData.get(0).getTeamName());
             RecyclerView recyclerView = findViewById(R.id.rv_LeagueTable);
             RecyclerView.Adapter adapter = new LeagueRecyclerViewAdapter(getApplicationContext(), leagueData);
             recyclerView.setAdapter(adapter);
@@ -87,9 +85,6 @@ public class LeagueActivity extends ActivityBase {
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        // Display the first 500 characters of the response string.
-                        //Log.d(TAG, "onResponse: " + response);
-
                         //call getLeagueFromJSON and parse the response to a new league list object
                         JsonToDataTask jsonToData = new JsonToDataTask();
                         leagueData = jsonToData.getLeagueFromJSON(getApplicationContext(), response);
@@ -101,7 +96,6 @@ public class LeagueActivity extends ActivityBase {
                         long nextDBRefresh = System.currentTimeMillis();
                         writeSharedPreferencesDBRefresh(nextDBRefresh, "LEAGUE", getSharedPreferencesSelectedLeague());
 
-                        //construct and add recyclerView data, need to move this out of here will probably slow app?
                         RecyclerView recyclerView = findViewById(R.id.rv_LeagueTable);
                         RecyclerView.Adapter adapter = new LeagueRecyclerViewAdapter(getApplicationContext(), leagueData);
                         recyclerView.setAdapter(adapter);
