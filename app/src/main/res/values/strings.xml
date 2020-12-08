@@ -15,15 +15,16 @@
     <string name="res_pointsLabel">Pts</string>
     <string name="res_posLabel">Pos</string>
     <string name="res_dash">-</string>
+    <string name="res_ClearData">Clear Database</string>
+    <string name="res_FAWSL" translatable="false">FA WSL</string>
+    <string name="res_WC" translatable="false">Womans Championship</string>
 
     <string name="shared_pref_file" translatable="false">uk.ash.womensfootball</string>
     <string name="shared_pref_league_id" translatable="false">2745</string>
     <string name="shared_pref_league_2745_update" translatable="false"></string>
-
-    <!-- Need to add the other leagues here TODO
-    <string name="shared_pref_league_2745_update" translatable="false"></string>
-    <string name="shared_pref_league_2745_update" translatable="false"></string>
-    <string name="shared_pref_league_2745_update" translatable="false"></string>-->
-
+    <!--<string name="shared_pref_league_3015_update" translatable="false"></string>-->
     <string name="shared_pref_fixture_2745_update" translatable="false"></string>
+    <!--<string name="shared_pref_fixture_3015_update" translatable="false"></string>-->
+    <string name="shared_pref_next_usage" translatable="false"></string>
+
 </resources>

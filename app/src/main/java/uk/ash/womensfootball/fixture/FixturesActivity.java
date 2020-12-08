@@ -3,6 +3,7 @@ package uk.ash.womensfootball.fixture;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -37,7 +38,7 @@ public class FixturesActivity extends ActivityBase {
     private List<FixtureData> lastFixtures;
     private List<FixtureData> nextFixtures;
     private String selectedLeague = "2745";
-    private FixtureDao fixtureDao;
+    //private FixtureDao fixtureDao;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,17 +54,9 @@ public class FixturesActivity extends ActivityBase {
             super.onCreate(savedInstanceState);
         }
 
-        synchronized (FixturesActivity.class) {
-            FixtureDatabase db = FixtureDatabase.getDatabase(this);
-            fixtureDao = db.fixtureDao();
-        }
-
         fixturesData = new ArrayList<>();
 
         selectedLeague = getSharedPreferencesSelectedLeague();
-
-        // TODO
-        //currently selected league, not implemented
 
         boolean shouldRefreshData = false;
         //check time of last refresh
@@ -71,10 +64,7 @@ public class FixturesActivity extends ActivityBase {
         Log.d("DEBUGDB", now + " now compareTo() + " + getSharedPreferencesLastUpdate("FIXTURE", selectedLeague));
         Log.d("DEBUGDB", "" + now.compareTo(getSharedPreferencesLastUpdate("FIXTURE", selectedLeague)));
 
-        //if(true)
-        //    return;
         if (now.compareTo(getSharedPreferencesLastUpdate("FIXTURE", selectedLeague)) > 0) {
-        //if (now - getSharedPreferencesLastUpdate("FIXTURE", selectedLeague) > MIN_AGE) {
             Log.d("DEBUGDB", "DB is old should refresh");
             shouldRefreshData = true;
         } else {
@@ -99,6 +89,9 @@ public class FixturesActivity extends ActivityBase {
     }
 
     public void requestFixtureUpdate() {
+        if(checkAPILimit())
+            return;
+        showToast("Updating Fixtures");
         lastFixtures = null;
         nextFixtures = null;
         fixturesData = new ArrayList<>();
@@ -110,10 +103,15 @@ public class FixturesActivity extends ActivityBase {
                     @Override
                     public void onResponse(String response) {
                         // Display the first 500 characters of the response string.
-                        Log.d(TAG, "onResponse: " + response);
+                        //Log.d(TAG, "onResponse: " + response);
                         //call getLeagueFromJSON and parse the response to a new league list object
                         JsonToDataTask jsonToData = new JsonToDataTask();
                         lastFixtures = jsonToData.getFixtureFromJSON(getApplicationContext(), response);
+
+                        if(lastFixtures == null || lastFixtures.isEmpty()) {
+                            showLimitReachedMessage();
+                            return;
+                        }
                     }
                 }, new Response.ErrorListener() {
             @Override
@@ -135,11 +133,17 @@ public class FixturesActivity extends ActivityBase {
                     @Override
                     public void onResponse(String response) {
                         // Display the first 500 characters of the response string.
-                        Log.d(TAG, "onResponse: " + response);
+                        //Log.d(TAG, "onResponse: " + response);
 
                         //call getLeagueFromJSON and parse the response to a new league list object
                         JsonToDataTask jsonToData = new JsonToDataTask();
                         nextFixtures = jsonToData.getFixtureFromJSON(getApplicationContext(), response);
+
+                        if(nextFixtures == null || nextFixtures.isEmpty()) {
+                            setUsageTimerInSharedPrefs();
+                            showLimitReachedMessage();
+                            return;
+                        }
                     }
                 }, new Response.ErrorListener() {
             @Override
@@ -221,5 +225,31 @@ public class FixturesActivity extends ActivityBase {
         public int compare(FixtureData o1, FixtureData o2) {
             return o1.getDateTime().compareTo(o2.getDateTime());
         }
+    }
+
+    private void refreshDB(){
+        requestFixtureUpdate();
+    }
+
+    //context menu handling
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.mi_Refresh:
+                refreshDB();
+                return true;
+            case R.id.mi_ClearDB:
+                wipeDB();
+                //show are you sure, yes or no warning
+                //then wipe the two DB's here, and get access to Events DB and wipe that to
+                return true;
+            //case R.id.mi_FASWL:
+            //    //changeLeagueSelectionTo("2745");
+            //    return true;
+            //case R.id.mi_WC:
+            //    changeLeagueSelectionTo("3015");
+            //    return true;
+        }
+        return true;
     }
 }

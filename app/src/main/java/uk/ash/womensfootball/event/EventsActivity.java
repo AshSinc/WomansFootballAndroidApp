@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -44,7 +45,7 @@ public class EventsActivity extends ActivityBase {
     private List<EventData> eventData;
     private FixtureData fixture;
     private EventDao eventDao;
-    private FixtureDao fixtureDao;
+    //private FixtureDao fixtureDao;
     private int fixtureID, homeTeamID, awayTeamID, homeTeamScore, awayTeamScore;
     private String homeTeamName, awayTeamName;
     private boolean gameComplete;
@@ -66,19 +67,24 @@ public class EventsActivity extends ActivityBase {
             super.onCreate(savedInstanceState);
         }
 
-        if (intent == null)
+        if (intent == null){
+            showToast("Error : No intent");
             return; //TODO should give a fail message but for now this will do, should never occur
+        }
+
 
         fixtureID = intent.getIntExtra("FIXTURE_ID", -1);
 
-        if(fixtureID == -1)
-            return; //TODO should give a fail message but for now this will do, should never occur
+        if(fixtureID == -1){
+            showToast("Error : No Event Id");
+            return;
+        }
 
         synchronized (EventsActivity.class) {
             EventDatabase eventsDb = EventDatabase.getDatabase(this);
             eventDao = eventsDb.eventDao();
-            FixtureDatabase db = FixtureDatabase.getDatabase(this);
-            fixtureDao = db.fixtureDao();
+            //FixtureDatabase db = FixtureDatabase.getDatabase(this);
+            //fixtureDao = db.fixtureDao();
             fixture = fixtureDao.findFixtureById(fixtureID);
         }
 
@@ -92,6 +98,10 @@ public class EventsActivity extends ActivityBase {
             awayTeamName = fixture.getTeamNameA();
             gameComplete = fixture.getGameComplete();
             kickoffTime = fixture.getDateTime();
+        }
+        else{
+            showToast("Error : Fixture is null, refresh fixtures");
+            return; //could force back to fixtures
         }
 
         //set the header info from savedInstanceState data
@@ -128,7 +138,6 @@ public class EventsActivity extends ActivityBase {
             } else if (now.compareTo(fixture.getNextEventUpdate()) > 0) {
                 Log.d(TAG, "onCreate: refresh threshold of 10 minutes has passed");
                 shouldRefreshData = true;
-                //TODO get last refresh time, need to save this in event, fixture would be better but much more awkward
             }
         }
 
@@ -145,6 +154,9 @@ public class EventsActivity extends ActivityBase {
     }
 
     public void requestEventsUpdate() {
+        if(checkAPILimit())
+            return;
+        showToast("Updating Events");
         //send Volley request to url
         RequestQueue queue = Volley.newRequestQueue(this);
         StringRequest stringRequest = new StringRequest(Request.Method.GET, getEventURL(String.valueOf(fixtureID)),
@@ -155,17 +167,24 @@ public class EventsActivity extends ActivityBase {
                         JsonToDataTask jsonToData = new JsonToDataTask();
                         eventData = jsonToData.getEventFromJSON(getApplicationContext(), response, fixtureID, homeTeamID);
 
-                        if (eventData == null || eventData.size() <= 0) {
-                            Log.d("DEBUGDB", "requestEventsUpdate() : eventData is null or empty, returning.");
+                        if(eventData == null || eventData.isEmpty()) {
+                            setUsageTimerInSharedPrefs();
+                            showLimitReachedMessage();
                             return;
                         }
+
+                        //if (eventData == null || eventData.size() <= 0) {
+                        //    Log.d("DEBUGDB", "requestEventsUpdate() : eventData is null or empty, returning.");
+                        //    showToast("No Data Found");
+                        //    return;
+                        //}
 
                         eventDao.insert(eventData);
 
                         //update the fixture timing in fixture DB
                         long nextEventRefresh = System.currentTimeMillis() + 600000; //set next refresh to 10 mins later
                         fixture.setNextEventUpdate(nextEventRefresh);
-                        fixtureDao.update(fixture); //TODO check this is actually working
+                        fixtureDao.update(fixture);
 
                         //Log.d("DEBUGDB", "Updated DB checking: " + eventData.);
 
@@ -225,6 +244,41 @@ public class EventsActivity extends ActivityBase {
 
     public String getEventURL(String id) {
         return "https://v2.api-football.com/events/" + id;
+    }
+
+    private void refreshDB(){
+        if(!gameComplete){
+            Long now = System.currentTimeMillis() / 1000; //system time in seconds
+            if (now.compareTo(Converters.longFromLdt(fixture.getDateTime())) > 0) { //if game has started but isnt complete
+                requestEventsUpdate();
+            }
+            else
+                showToast("Game not started");
+        }
+        else
+            showToast("Game is over");
+    }
+
+    //context menu handling
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.mi_Refresh:
+                refreshDB();
+                return true;
+            case R.id.mi_ClearDB:
+                wipeDB();
+                //show are you sure, yes or no warning
+                //then wipe the two DB's here, and get access to Events DB and wipe that to
+                return true;
+            //case R.id.mi_FASWL:
+            //    //changeLeagueSelectionTo("2745");
+            //    return true;
+            //case R.id.mi_WC:
+            //    changeLeagueSelectionTo("3015");
+            //    return true;
+        }
+        return true;
     }
 
 }

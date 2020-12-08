@@ -1,33 +1,46 @@
 package uk.ash.womensfootball;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.tabs.TabLayout;
 
 import java.time.format.DateTimeFormatter;
 
+import uk.ash.womensfootball.event.EventDao;
+import uk.ash.womensfootball.event.EventDatabase;
+import uk.ash.womensfootball.fixture.FixtureDao;
+import uk.ash.womensfootball.fixture.FixtureDatabase;
 import uk.ash.womensfootball.fixture.FixturesActivity;
 import uk.ash.womensfootball.league.LeagueActivity;
+import uk.ash.womensfootball.league.LeagueDao;
+import uk.ash.womensfootball.league.LeagueDatabase;
 
 //acts as a base class for the three Activity tabs
 public class ActivityBase extends AppCompatActivity {
     protected static boolean NEVER_UPDATE = false;
     protected static String TAG = "DebugTag";
     //custom date/time pattern
-    //public static DateTimeFormatter TIME_PATTERN = DateTimeFormatter.ofPattern("d LLL 'Kickoff' HH:mm");
     public static DateTimeFormatter TIME_PATTERN = DateTimeFormatter.ofPattern("d LLL YY 'Kickoff' HH:mm");
     protected static SharedPreferences sharedPreferences;
+    protected LeagueDao leagueDao;
+    protected EventDao eventDao;
+    protected FixtureDao fixtureDao;
+    private int activitySelected; //tracks currently selected activity, default to 0
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,8 +49,8 @@ public class ActivityBase extends AppCompatActivity {
         // instantiate the sharedPreferences
         sharedPreferences = getSharedPreferences(getString(R.string.shared_pref_file), MODE_PRIVATE);
 
-        int activitySelected = 0; //tracks currently selected activity, default to 0
 
+        activitySelected = 0;
         // checks savedInstanceState for ACTIVITY number for setting setContentView to correct layout
         if (savedInstanceState != null) {
             activitySelected = savedInstanceState.getInt("ACTIVITY", 0);
@@ -58,13 +71,38 @@ public class ActivityBase extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.tb_Toolbar);
         //toolbar.setTitle(getString(R.string.res_league)); //change the ActionBarTitle
         setSupportActionBar(toolbar); // Sets the Toolbar to act as the ActionBar for this Activity window.
+        //getSupportActionBar().setTitle(getSharedPreferencesLeagueName());
         getSupportActionBar().setDisplayShowTitleEnabled(false); //hide the title, possibly use for displaying League Name
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabLayout); //get the tab bar
         tabLayout.selectTab(tabLayout.getTabAt(activitySelected), true);  //re-selects the correct tab using the value passed by savedInstanceState
         //adds a new listener to the tabLayout, and passes a new TabSelectedActivitySwitch to control activity switching, have to pass context, this passes the child context if called from child instance
         tabLayout.addOnTabSelectedListener(new ActivityBase.TabSelectedActivitySwitch(this));
+
+        synchronized (this) {
+            LeagueDatabase leagueDb = LeagueDatabase.getDatabase(this);
+            leagueDao = leagueDb.leagueDao();
+            FixtureDatabase fixtureDb = FixtureDatabase.getDatabase(this);
+            fixtureDao = fixtureDb.fixtureDao();
+            EventDatabase eventsDb = EventDatabase.getDatabase(this);
+            eventDao = eventsDb.eventDao();
+            //fixture = fixtureDao.findFixtureById(fixtureID);
+        }
     }
+
+    /*private void refreshDB(){
+        switch (activitySelected) {
+            case 0:
+                switchActivityTo(LeagueActivity.class, this);
+                break;
+            case 1:
+                switchActivityTo(FixturesActivity.class, this);
+                break;
+            case 2:
+                switchActivityTo(EventsActivity.class, this);
+                break;
+        }
+    }*/
 
     //adds dropdown menu to Actionbar
     @Override
@@ -74,7 +112,21 @@ public class ActivityBase extends AppCompatActivity {
         return true;
     }
 
+    //no longer needed, leaving in API may be updated with more endpoints one day
+    private void changeLeagueSelectionTo(String leagueId){
+        switch (leagueId) {
+            case ("2745"):
+                writeSharedPreferencesSelectedLeague("2745");
+                break;
+            //case ("3015"):
+            //    writeSharedPreferencesSelectedLeague("3015");
+            //    break;
+        }
+        switchActivityTo(LeagueActivity.class, this);
+    }
+
     //switches to passed activity, needs Context as its static and called from static listener TabSelectedActivitySwitch
+    //protected static void switchActivityTo(Class activity, Context context) {
     private static void switchActivityTo(Class activity, Context context) {
         Intent intent = new Intent(context, activity); //Intent, the activity we want to switch to
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION); //stops animation on switching activity, stops annoying flicker
@@ -83,10 +135,11 @@ public class ActivityBase extends AppCompatActivity {
     }
 
     protected String getSharedPreferencesSelectedLeague() {
+        Log.d(TAG, "getSharedPreferencesSelectedLeague: " + sharedPreferences.getString(getString(R.string.shared_pref_league_id), new String("2745")) );
         return sharedPreferences.getString(getString(R.string.shared_pref_league_id), new String("2745"));
     }
 
-    protected void writeSharedPreferencesSelectedLeague(String leagueId) { //TODO need to use this
+    private void writeSharedPreferencesSelectedLeague(String leagueId) { //TODO need to use this
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.remove(getString(R.string.shared_pref_league_id));
         editor.apply();
@@ -99,17 +152,28 @@ public class ActivityBase extends AppCompatActivity {
         if(activityName.matches("LEAGUE")) {
             if(id.matches("2745")) {
                 prefId = R.string.shared_pref_league_2745_update;
-                /*editPref = getString(R.string.shared_pref_league_2745_update);
-                editPref = getString(R.string.shared_pref_league_2745_update);*/
             }
+            //if(id.matches("3015")) {
+            //    prefId = R.string.shared_pref_league_3015_update;
+            //}
         }
         else if(activityName.matches("FIXTURE")) {
             if(id.matches("2745")) {
                 prefId = R.string.shared_pref_fixture_2745_update;
             }
+            //if(id.matches("3015")) {
+            //    prefId = R.string.shared_pref_fixture_3015_update;
+            //}
         }
-        //Log.d(TAG, "getPreferenceStringFor: " + activityName + " " + id + " = " + prefId);
         return prefId;
+    }
+
+    protected String getSharedPreferencesLeagueName(){//String leagueId){
+        switch (getSharedPreferencesSelectedLeague()){
+            case("2745"): return getString(R.string.res_FAWSL);
+            //case("3015"): return getString(R.string.res_WC);
+        }
+        return getString(R.string.res_FAWSL);
     }
 
     protected Long getSharedPreferencesLastUpdate(String activityName, String id) {
@@ -117,8 +181,8 @@ public class ActivityBase extends AppCompatActivity {
         return sharedPreferences.getLong(getString(prefId), 0);
     }
 
-    protected void writeSharedPreferencesDBRefresh(long lastUpdate, String activityName, String id) {
-        Log.d(TAG, "writeSharedPreferencesDBRefresh: " + lastUpdate + activityName + id );
+    protected void writeSharedPreferencesDBRefresh(long nextUpdate, String activityName, String id) {
+        Log.d(TAG, "writeSharedPreferencesDBRefresh: " + nextUpdate + activityName + id );
         int prefId = getPreferenceIdFor(activityName, id); //TODO what was i doing in there? Why does that work 0o
 
         if(prefId == -1) {
@@ -130,9 +194,13 @@ public class ActivityBase extends AppCompatActivity {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.remove(getString(prefId));
         editor.apply();
-        editor.putLong(getString(prefId), lastUpdate);
+        editor.putLong(getString(prefId), nextUpdate);
         editor.apply();
-}
+    }
+
+    protected void showToast(String message){
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+    }
 
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
@@ -149,6 +217,92 @@ public class ActivityBase extends AppCompatActivity {
         }*/
     }
 
+    protected void showLimitReachedMessage(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Daily Usage Limit Reached");
+        builder.setMessage("Purchase a subscription or try again tomorrow");
+
+        // Set the alert dialog yes button click listener
+        builder.setPositiveButton("Payment", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                showToast("Thank you");
+                //TODO Set a timer for a day in sharedpref, and then block based on that timer
+                //TODO would take implicit intent to payment page of website
+            }
+        });
+
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                //showToast("Cancelled");
+                //TODO Set a timer for a day in sharedpref, and then block based on that timer
+            }
+        });
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    protected boolean checkAPILimit(){
+        Long now = System.currentTimeMillis();
+        if(now.compareTo(getUsageTimerInSharedPrefs()) < 0) {
+            Log.d(TAG, "checkAPILimit: Limit Reached");
+            showLimitReachedMessage();
+            return true;
+        }
+        Log.d(TAG, "checkAPILimit: Limit Not Reached");
+        return false;
+    }
+
+    protected void setUsageTimerInSharedPrefs(){
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.remove(getString(R.string.shared_pref_next_usage));
+        editor.apply();
+        editor.putLong(getString(R.string.shared_pref_next_usage), System.currentTimeMillis() + 86400000);
+        editor.apply();
+    }
+
+    private long getUsageTimerInSharedPrefs(){
+        return sharedPreferences.getLong(getString(R.string.shared_pref_next_usage), 0);
+    }
+
+    protected void wipeDB(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Clear Database Entries?");
+        builder.setMessage("Are you sure?");
+
+        // Set the alert dialog yes button click listener
+        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                showToast("Wiping data");
+                switch (activitySelected){
+                    case 0:
+                        ((RecyclerView)findViewById(R.id.rv_LeagueTable)).setLayoutManager(null);
+                        leagueDao.clearTable();break;
+                    case 1:
+                        ((RecyclerView)findViewById(R.id.rv_FixtureTable)).setLayoutManager(null);
+                        fixtureDao.clearTable();break;
+                    case 2:
+                        ((RecyclerView)findViewById(R.id.rv_EventTable)).setLayoutManager(null);
+                        eventDao.clearTable();break;
+                }
+            }
+        });
+
+        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                showToast("Cancelled data wipe");
+            }
+        });
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -164,8 +318,7 @@ public class ActivityBase extends AppCompatActivity {
         //updateSharedPreferencesWithFavouriteLocation();
     }
 
-    //returns the badge for Team, needed in all activities
-    //todo - need to set up an array or DB of teams and get all their badges stored - associate id and teams/badges
+    //returns the team icon, needed in all activities
     public static Drawable getBadgeForTeam(Context context, int id) {
         Drawable d;
         switch (id) {

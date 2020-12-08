@@ -17,19 +17,11 @@ public interface FixtureDao {
     @Update(onConflict = OnConflictStrategy.REPLACE)
     public void update(FixtureData fixtureData);
 
-    //@Query("SELECT * from fixture_data")
-    //public List<FixtureData> getAll();
-
     @Query("SELECT * from fixture_data WHERE leagueId LIKE :leagueId")
     public List<FixtureData> findByLeagueId(String leagueId);
 
     @Query("SELECT * from fixture_data WHERE fixtureId LIKE :fixtureId")
     public FixtureData findFixtureById(int fixtureId);
-
-
-
-    //@Delete
-    //public void delete(FixtureData fixtureData);
 
     //clear table
     @Query("DELETE FROM fixture_data")

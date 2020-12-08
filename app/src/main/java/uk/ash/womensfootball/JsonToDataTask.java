@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.Log;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.time.Instant;
@@ -18,10 +19,23 @@ import uk.ash.womensfootball.league.LeagueData;
 
 public class JsonToDataTask {
 
+    private boolean checkForError(JSONObject jsonObj){
+        try {
+            if(jsonObj.getJSONObject("api").has("error"))
+                return true;
+        } catch (JSONException e) {
+            Log.d("DEBUGAPI", "checkForError: " + e.toString());
+        }
+        return false;
+    }
+
     public List<LeagueData> getLeagueFromJSON(Context context, String jsonString) {
         List<LeagueData> league = new ArrayList<>();
         try {
             JSONObject jsonObj = new JSONObject(jsonString);
+
+            if(checkForError(jsonObj))
+                return league;
             //get the standings array for each team
             JSONArray standingsJsonObj = jsonObj.getJSONObject("api").getJSONArray("standings").getJSONArray(0);
             String name;
@@ -54,6 +68,9 @@ public class JsonToDataTask {
         List<FixtureData> fixture = new ArrayList<>();
         try {
             JSONObject jsonObj = new JSONObject(jsonString);
+
+            if(checkForError(jsonObj))
+                return fixture;
             //get the fixtures array
             JSONArray fixturesJsonArray = jsonObj.getJSONObject("api").getJSONArray("fixtures");
 
@@ -69,7 +86,15 @@ public class JsonToDataTask {
                 Log.d("each event  ", fixtureJsonObj.toString());
                 fixtureId = fixtureJsonObj.getInt("fixture_id");
                 leagueId = fixtureJsonObj.getInt("league_id");
-                gameComplete = (fixtureJsonObj.getString("statusShort") == "FT"); //TODO doesnt handle matches that are cancelled or postponed etc
+
+                String statusShort = fixtureJsonObj.getString("statusShort");
+                if(statusShort.contains("FT") || statusShort.contains("AET") || statusShort.contains("PEN") ||
+                statusShort.contains("SUSP") || statusShort.contains("INT") || statusShort.contains("PST") ||
+                statusShort.contains("CANC") || statusShort.contains("ABD") || statusShort.contains("AWD"))
+                    gameComplete = true;
+                else
+                    gameComplete = false;
+
                 JSONObject homeTeamObj = fixtureJsonObj.getJSONObject("homeTeam");
                 teamIdH = homeTeamObj.getInt("team_id");
                 teamNameH = homeTeamObj.getString("team_name");
@@ -102,6 +127,10 @@ public class JsonToDataTask {
         List<EventData> events = new ArrayList<>();
         try {
             JSONObject jsonObj = new JSONObject(jsonString);
+
+            if(checkForError(jsonObj))
+                return events;
+
             Log.d("EVENTS", "getEventFromJSON: " + jsonObj.toString());
             //TODO {"api":{"results":0,"error":"You have reached the request limit for the day"}}
             //get the events array

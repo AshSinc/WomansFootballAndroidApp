@@ -2,6 +2,7 @@ package uk.ash.womensfootball.league;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -21,12 +22,14 @@ import java.util.Map;
 import uk.ash.womensfootball.ActivityBase;
 import uk.ash.womensfootball.JsonToDataTask;
 import uk.ash.womensfootball.R;
+import uk.ash.womensfootball.event.EventsActivity;
+import uk.ash.womensfootball.fixture.FixturesActivity;
 
 
 public class LeagueActivity extends ActivityBase {
     private List<LeagueData> leagueData;
     private String selectedLeague = "2745";
-    private LeagueDao leagueDao;
+    //private LeagueDao leagueDao;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,11 +41,6 @@ public class LeagueActivity extends ActivityBase {
         } else {
             savedInstanceState.putInt("ACTIVITY", 0);
             super.onCreate(savedInstanceState);
-        }
-
-        synchronized (LeagueActivity.class) {
-            LeagueDatabase db = LeagueDatabase.getDatabase(this);
-            leagueDao = db.leagueDao();
         }
 
         selectedLeague = getSharedPreferencesSelectedLeague();
@@ -68,6 +66,7 @@ public class LeagueActivity extends ActivityBase {
         }
         if(NEVER_UPDATE)
             shouldRefreshData = false; //TODO remove
+        //shouldRefreshData = true;
         if (shouldRefreshData) {
             requestLeagueUpdate();
         } else {
@@ -80,14 +79,29 @@ public class LeagueActivity extends ActivityBase {
 
     public void requestLeagueUpdate() {
         //send Volley request to url
+        if(checkAPILimit())
+            return;
+
+        showToast("Updating League Table");
         RequestQueue queue = Volley.newRequestQueue(this);
         StringRequest stringRequest = new StringRequest(Request.Method.GET, getLeagueURL(selectedLeague),
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
+                        //Log.d(TAG, "onResponse: " + response);
+
+                        //Log.v(TAG, response.substring(0, response.length()/2));
+                        //Log.v(TAG, response.substring(response.length()/2, response.length()));
+
                         //call getLeagueFromJSON and parse the response to a new league list object
                         JsonToDataTask jsonToData = new JsonToDataTask();
                         leagueData = jsonToData.getLeagueFromJSON(getApplicationContext(), response);
+
+                        if(leagueData == null || leagueData.isEmpty()) {
+                            setUsageTimerInSharedPrefs();
+                            showLimitReachedMessage();
+                            return;
+                        }
 
                         leagueDao.insert(leagueData);
 
@@ -122,5 +136,32 @@ public class LeagueActivity extends ActivityBase {
 
     public String getLeagueURL(String id) {
         return "https://v2.api-football.com/leagueTable/" + id;
+        //return "https://v2.api-football.com/leagues/team/15405";
+    }
+
+    private void refreshDB(){
+        requestLeagueUpdate();
+    }
+
+    //context menu handling
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.mi_Refresh:
+                refreshDB();
+                return true;
+            case R.id.mi_ClearDB:
+                wipeDB();
+                //show are you sure, yes or no warning
+                //then wipe the two DB's here, and get access to Events DB and wipe that to
+                return true;
+            //case R.id.mi_FASWL:
+            //    //changeLeagueSelectionTo("2745");
+            //    return true;
+            //case R.id.mi_WC:
+            //    changeLeagueSelectionTo("3015");
+            //    return true;
+        }
+        return true;
     }
 }

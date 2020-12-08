@@ -21,4 +21,7 @@ public interface LeagueDao {
 
     @Delete
     public void delete(LeagueData leagueData);
+
+    @Query("DELETE FROM league_data")
+    void clearTable();
 }
