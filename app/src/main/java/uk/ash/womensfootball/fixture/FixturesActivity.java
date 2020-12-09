@@ -16,10 +16,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -30,7 +27,6 @@ import uk.ash.womensfootball.Converters;
 import uk.ash.womensfootball.JsonToDataTask;
 import uk.ash.womensfootball.R;
 import uk.ash.womensfootball.event.EventsActivity;
-import uk.ash.womensfootball.league.LeagueRecyclerViewAdapter;
 
 
 public class FixturesActivity extends ActivityBase {
@@ -38,7 +34,6 @@ public class FixturesActivity extends ActivityBase {
     private List<FixtureData> lastFixtures;
     private List<FixtureData> nextFixtures;
     private String selectedLeague = "2745";
-    //private FixtureDao fixtureDao;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,7 +71,7 @@ public class FixturesActivity extends ActivityBase {
                 shouldRefreshData = true;
         }
         if(NEVER_UPDATE)
-            shouldRefreshData = false; //TODO remove
+            shouldRefreshData = false;
         if (shouldRefreshData) {
             requestFixtureUpdate();
         } else {
@@ -102,11 +97,9 @@ public class FixturesActivity extends ActivityBase {
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        // Display the first 500 characters of the response string.
-                        //Log.d(TAG, "onResponse: " + response);
                         //call getLeagueFromJSON and parse the response to a new league list object
                         JsonToDataTask jsonToData = new JsonToDataTask();
-                        lastFixtures = jsonToData.getFixtureFromJSON(getApplicationContext(), response);
+                        lastFixtures = jsonToData.getFixtureFromJSON(response);
 
                         if(lastFixtures == null || lastFixtures.isEmpty()) {
                             showLimitReachedMessage();
@@ -132,12 +125,9 @@ public class FixturesActivity extends ActivityBase {
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        // Display the first 500 characters of the response string.
-                        //Log.d(TAG, "onResponse: " + response);
-
                         //call getLeagueFromJSON and parse the response to a new league list object
                         JsonToDataTask jsonToData = new JsonToDataTask();
-                        nextFixtures = jsonToData.getFixtureFromJSON(getApplicationContext(), response);
+                        nextFixtures = jsonToData.getFixtureFromJSON(response);
 
                         if(nextFixtures == null || nextFixtures.isEmpty()) {
                             setUsageTimerInSharedPrefs();
@@ -203,12 +193,10 @@ public class FixturesActivity extends ActivityBase {
     }
 
     public String getLastFixturesURL(String id) {
-        //TODO get timezone from phone
         return "https://v2.api-football.com/fixtures/league/" + id + "/last/20?timezone=Europe/London";
     }
 
     public String getNextFixturesURL(String id) {
-        //TODO get timezone from phone
         return "https://v2.api-football.com/fixtures/league/" + id + "/next/20?timezone=Europe/London";
     }
 

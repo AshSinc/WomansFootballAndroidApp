@@ -22,14 +22,10 @@ import java.util.Map;
 import uk.ash.womensfootball.ActivityBase;
 import uk.ash.womensfootball.JsonToDataTask;
 import uk.ash.womensfootball.R;
-import uk.ash.womensfootball.event.EventsActivity;
-import uk.ash.womensfootball.fixture.FixturesActivity;
-
 
 public class LeagueActivity extends ActivityBase {
     private List<LeagueData> leagueData;
     private String selectedLeague = "2745";
-    //private LeagueDao leagueDao;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,9 +40,6 @@ public class LeagueActivity extends ActivityBase {
         }
 
         selectedLeague = getSharedPreferencesSelectedLeague();
-
-        // TODO
-        //currently selected league, not implemented
 
         boolean shouldRefreshData = false;
         //check time of last refresh
@@ -65,8 +58,7 @@ public class LeagueActivity extends ActivityBase {
                 shouldRefreshData = true;
         }
         if(NEVER_UPDATE)
-            shouldRefreshData = false; //TODO remove
-        //shouldRefreshData = true;
+            shouldRefreshData = false;
         if (shouldRefreshData) {
             requestLeagueUpdate();
         } else {
@@ -88,14 +80,9 @@ public class LeagueActivity extends ActivityBase {
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        //Log.d(TAG, "onResponse: " + response);
-
-                        //Log.v(TAG, response.substring(0, response.length()/2));
-                        //Log.v(TAG, response.substring(response.length()/2, response.length()));
-
                         //call getLeagueFromJSON and parse the response to a new league list object
                         JsonToDataTask jsonToData = new JsonToDataTask();
-                        leagueData = jsonToData.getLeagueFromJSON(getApplicationContext(), response);
+                        leagueData = jsonToData.getLeagueFromJSON(response);
 
                         if(leagueData == null || leagueData.isEmpty()) {
                             setUsageTimerInSharedPrefs();
@@ -104,8 +91,6 @@ public class LeagueActivity extends ActivityBase {
                         }
 
                         leagueDao.insert(leagueData);
-
-                        Log.d("DEBUGDB", "Updated DB checking: " + leagueDao.findByLeagueId(getSharedPreferencesSelectedLeague()).get(0).getTeamName());
 
                         long nextDBRefresh = System.currentTimeMillis();
                         writeSharedPreferencesDBRefresh(nextDBRefresh, "LEAGUE", getSharedPreferencesSelectedLeague());
@@ -136,7 +121,6 @@ public class LeagueActivity extends ActivityBase {
 
     public String getLeagueURL(String id) {
         return "https://v2.api-football.com/leagueTable/" + id;
-        //return "https://v2.api-football.com/leagues/team/15405";
     }
 
     private void refreshDB(){

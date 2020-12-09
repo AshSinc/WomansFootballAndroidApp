@@ -15,7 +15,6 @@ import java.util.List;
 
 import uk.ash.womensfootball.ActivityBase;
 import uk.ash.womensfootball.R;
-import uk.ash.womensfootball.league.LeagueData;
 
 public class FixtureRecyclerViewAdapter extends RecyclerView.Adapter<FixtureRecyclerViewAdapter.FixtureViewHolder> {
 

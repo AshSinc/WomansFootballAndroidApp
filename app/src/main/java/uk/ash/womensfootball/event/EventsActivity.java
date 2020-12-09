@@ -22,7 +22,6 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,25 +30,17 @@ import uk.ash.womensfootball.ActivityBase;
 import uk.ash.womensfootball.Converters;
 import uk.ash.womensfootball.JsonToDataTask;
 import uk.ash.womensfootball.R;
-import uk.ash.womensfootball.fixture.FixtureDao;
 import uk.ash.womensfootball.fixture.FixtureData;
-import uk.ash.womensfootball.fixture.FixtureDatabase;
-import uk.ash.womensfootball.fixture.FixturesActivity;
-import uk.ash.womensfootball.league.LeagueActivity;
-import uk.ash.womensfootball.league.LeagueDao;
-import uk.ash.womensfootball.league.LeagueDatabase;
-import uk.ash.womensfootball.league.LeagueRecyclerViewAdapter;
 
 
 public class EventsActivity extends ActivityBase {
     private List<EventData> eventData;
     private FixtureData fixture;
     private EventDao eventDao;
-    //private FixtureDao fixtureDao;
     private int fixtureID, homeTeamID, awayTeamID, homeTeamScore, awayTeamScore;
     private String homeTeamName, awayTeamName;
     private boolean gameComplete;
-    private LocalDateTime kickoffTime, updateTime;
+    private LocalDateTime kickoffTime;
     private int MAX_AGE = 60000;
 
     @Override
@@ -83,8 +74,6 @@ public class EventsActivity extends ActivityBase {
         synchronized (EventsActivity.class) {
             EventDatabase eventsDb = EventDatabase.getDatabase(this);
             eventDao = eventsDb.eventDao();
-            //FixtureDatabase db = FixtureDatabase.getDatabase(this);
-            //fixtureDao = db.fixtureDao();
             fixture = fixtureDao.findFixtureById(fixtureID);
         }
 
@@ -142,7 +131,7 @@ public class EventsActivity extends ActivityBase {
         }
 
         if(NEVER_UPDATE)
-            shouldRefreshData = false; //TODO remove
+            shouldRefreshData = false;
         if (shouldRefreshData) {
             requestEventsUpdate();
         } else {
@@ -165,7 +154,7 @@ public class EventsActivity extends ActivityBase {
                     public void onResponse(String response) {
                         //call getLeagueFromJSON and parse the response to a new event list object
                         JsonToDataTask jsonToData = new JsonToDataTask();
-                        eventData = jsonToData.getEventFromJSON(getApplicationContext(), response, fixtureID, homeTeamID);
+                        eventData = jsonToData.getEventFromJSON(response, fixtureID, homeTeamID);
 
                         if(eventData == null || eventData.isEmpty()) {
                             setUsageTimerInSharedPrefs();
@@ -173,22 +162,12 @@ public class EventsActivity extends ActivityBase {
                             return;
                         }
 
-                        //if (eventData == null || eventData.size() <= 0) {
-                        //    Log.d("DEBUGDB", "requestEventsUpdate() : eventData is null or empty, returning.");
-                        //    showToast("No Data Found");
-                        //    return;
-                        //}
-
                         eventDao.insert(eventData);
 
                         //update the fixture timing in fixture DB
                         long nextEventRefresh = System.currentTimeMillis() + 600000; //set next refresh to 10 mins later
                         fixture.setNextEventUpdate(nextEventRefresh);
                         fixtureDao.update(fixture);
-
-                        //Log.d("DEBUGDB", "Updated DB checking: " + eventData.);
-
-                        //Log.d("DEBUGDB", "Updated DB checking: " + eventDao.findByFixtureId(fixtureID).get(0).toString());
 
                         //construct and add recyclerView data, need to move this out of here will probably slow app?
                         RecyclerView recyclerView = findViewById(R.id.rv_EventTable);
@@ -233,9 +212,6 @@ public class EventsActivity extends ActivityBase {
             case ("Miss"):
                 d = ContextCompat.getDrawable(context, R.drawable.miss);
                 break;
-            //case (5):
-             //   d = null;
-             //   break;
             default:
                 d = ContextCompat.getDrawable(context, android.R.drawable.btn_star_big_on);
         }

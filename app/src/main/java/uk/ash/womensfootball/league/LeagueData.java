@@ -1,7 +1,5 @@
 package uk.ash.womensfootball.league;
 
-import android.graphics.drawable.Drawable;
-
 import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
@@ -27,7 +25,7 @@ public class LeagueData {
     public LeagueData(String teamName, int played, int wins, int draws, int losses, int goalDiff, int points, int teamId) {
         this.leagueId = "2745"; //temp hardcoded, should be passed in TODO
         this.teamName = teamName;
-        this.uid = leagueId+teamName;
+        this.uid = leagueId + teamName;
         this.played = played;
         this.wins = wins;
         this.draws = draws;
@@ -41,63 +39,49 @@ public class LeagueData {
     public String getTeamName() {
         return teamName;
     }
+
     public int getPlayed() {
         return played;
     }
+
     public int getWins() {
         return wins;
     }
+
     public int getDraws() {
         return draws;
     }
+
     public int getLosses() {
         return losses;
     }
+
     public int getGoalDiff() {
         return goalDiff;
     }
+
     public int getPoints() {
         return points;
     }
 
-    public int getTeamId(){
+    public int getTeamId() {
         return teamId;
     }
-    public String getUid(){
+
+    public String getUid() {
         return uid;
     }
-    public String getLeagueId(){
+
+    public String getLeagueId() {
         return leagueId;
     }
 
-    //setters - maybe not needed
-    public void setTeamName(String n) {
-        teamName = n;
-    }
-    public void setPlayed(int p) {
-        played = p;
-    }
-    public void setWins(int w) {
-        wins = w;
-    }
-    public void setDraws(int d) {
-        draws = d;
-    }
-    public void setLosses(int l) {
-        losses = l;
-    }
-    public void setGoalDiff(int gd) {
-        goalDiff = gd;
-    }
-    public void setPoints(int pts) {
-        points = pts;
-    }
-    public void setTeamId(int i){
-        teamId = i;
-    }
-    public void setUid(String i){
+    public void setUid(String i) {
         uid = i;
     }
-    public void setLeagueId(String s){ leagueId = s;}
+
+    public void setLeagueId(String s) {
+        leagueId = s;
+    }
 }
 

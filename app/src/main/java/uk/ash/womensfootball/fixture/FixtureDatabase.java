@@ -8,9 +8,6 @@ import androidx.room.RoomDatabase;
 import androidx.room.TypeConverters;
 
 import uk.ash.womensfootball.Converters;
-import uk.ash.womensfootball.league.LeagueDao;
-import uk.ash.womensfootball.league.LeagueData;
-import uk.ash.womensfootball.league.LeagueDatabase;
 
 @Database(entities = {FixtureData.class}, version = 1, exportSchema = false)
 @TypeConverters({Converters.class})

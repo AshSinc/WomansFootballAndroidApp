@@ -79,13 +79,8 @@ public class LeagueRecyclerViewAdapter extends RecyclerView.Adapter<LeagueRecycl
         @Override
         public void onClick(View view) {
             int pos = getAdapterPosition(); //get clicked item pos
-
             Log.d("DEBUG", "onClick: " + pos + " is team - " + data.get(pos).getTeamName());
-
-            //get team name from data at that pos.
-            //data.get(pos).getTeamName();
-            //then switch to fixtures and show only those upcoming games? maybe possible depends on api
-
+            //if ever wanted to navigate based on teams
         }
     }
 }

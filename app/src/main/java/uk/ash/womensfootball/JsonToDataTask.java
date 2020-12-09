@@ -1,15 +1,12 @@
 package uk.ash.womensfootball;
 
-import android.content.Context;
 import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,7 +26,7 @@ public class JsonToDataTask {
         return false;
     }
 
-    public List<LeagueData> getLeagueFromJSON(Context context, String jsonString) {
+    public List<LeagueData> getLeagueFromJSON(String jsonString) {
         List<LeagueData> league = new ArrayList<>();
         try {
             JSONObject jsonObj = new JSONObject(jsonString);
@@ -64,7 +61,7 @@ public class JsonToDataTask {
         }
     }
 
-    public List<FixtureData> getFixtureFromJSON(Context context, String jsonString) {
+    public List<FixtureData> getFixtureFromJSON(String jsonString) {
         List<FixtureData> fixture = new ArrayList<>();
         try {
             JSONObject jsonObj = new JSONObject(jsonString);
@@ -83,7 +80,6 @@ public class JsonToDataTask {
             for (int x = 0; x < fixturesJsonArray.length(); x++) {
                 //loop through each fixture entry and extract data
                 JSONObject fixtureJsonObj = fixturesJsonArray.getJSONObject(x);
-                Log.d("each event  ", fixtureJsonObj.toString());
                 fixtureId = fixtureJsonObj.getInt("fixture_id");
                 leagueId = fixtureJsonObj.getInt("league_id");
 
@@ -101,7 +97,6 @@ public class JsonToDataTask {
                 JSONObject awayTeamObj = fixtureJsonObj.getJSONObject("awayTeam");
                 teamIdA = awayTeamObj.getInt("team_id");
                 teamNameA = awayTeamObj.getString("team_name");
-
 
                 try {
                     homeScore = fixtureJsonObj.getInt("goalsHomeTeam");
@@ -123,7 +118,7 @@ public class JsonToDataTask {
         }
     }
 
-    public List<EventData> getEventFromJSON(Context context, String jsonString, int fixtureId, int homeTeamId) {
+    public List<EventData> getEventFromJSON(String jsonString, int fixtureId, int homeTeamId) {
         List<EventData> events = new ArrayList<>();
         try {
             JSONObject jsonObj = new JSONObject(jsonString);
@@ -131,8 +126,6 @@ public class JsonToDataTask {
             if(checkForError(jsonObj))
                 return events;
 
-            Log.d("EVENTS", "getEventFromJSON: " + jsonObj.toString());
-            //TODO {"api":{"results":0,"error":"You have reached the request limit for the day"}}
             //get the events array
             JSONArray eventsJsonObj = jsonObj.getJSONObject("api").getJSONArray("events");
             for (int x = 0; x < eventsJsonObj.length(); x++) {
@@ -158,7 +151,6 @@ public class JsonToDataTask {
 
     public String[] getTypeAndDescOfEvent(String type, String player, String detail) {
         String[] returnStringArray = new String[2];
-
         if (type.matches("Goal")) {
             if (detail.matches("Missed Penalty")) {
                 returnStringArray[0] = "Miss";

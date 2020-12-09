@@ -1,13 +1,10 @@
 package uk.ash.womensfootball.fixture;
 
-import android.graphics.drawable.Drawable;
-
 import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
 //basic class to hold and retrieve fixture data
 @Entity(tableName = "fixture_data")
@@ -56,7 +53,6 @@ public class FixtureData {
     public LocalDateTime getDateTime(){
         return dateTime;
     }
-
     public int getFixtureId(){
         return fixtureId;
     }
@@ -69,35 +65,12 @@ public class FixtureData {
     public int getTeamIdA(){
         return teamIdA;
     }
-
     public boolean getGameComplete(){
         return gameComplete;
     }
-
     public long getNextEventUpdate(){
         return nextEventUpdate;
     }
-
-    //setters - probably don't need
-    public void setTeamNameH(String n){
-        teamNameH = n;
-    }
-    public void setTeamNameA(String n){
-        teamNameA = n;
-    }
-    public void setHomeScore(int s){
-        homeScore = s;
-    }
-    public void setAwayScore(int s){
-        awayScore = s;
-    }
-    public void setDateTime(LocalDateTime d){
-        dateTime = d;
-    }
-    public void setFixtureId(int i){
-        fixtureId = i;
-    }
-
     public void setNextEventUpdate(long l){
         nextEventUpdate = l;
     }
