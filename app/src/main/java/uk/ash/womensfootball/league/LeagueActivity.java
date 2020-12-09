@@ -24,8 +24,7 @@ import uk.ash.womensfootball.JsonToDataTask;
 import uk.ash.womensfootball.R;
 
 public class LeagueActivity extends ActivityBase {
-    private List<LeagueData> leagueData;
-    private String selectedLeague = "2745";
+    private List<LeagueData> leagueData; //holds all LeagueData
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,26 +38,22 @@ public class LeagueActivity extends ActivityBase {
             super.onCreate(savedInstanceState);
         }
 
-        selectedLeague = getSharedPreferencesSelectedLeague();
-
-        boolean shouldRefreshData = false;
-        //check time of last refresh
-        Long now = System.currentTimeMillis()/1000;
-
-        if(now.compareTo(getSharedPreferencesLastUpdate("FIXTURE", selectedLeague)) > 0){
+        //checks if can update based on shared prefs timings activity and leagueId
+        if (now.compareTo(getSharedPreferencesLastUpdate("FIXTURE", selectedLeague)) > 0) {
             Log.d("DEBUGDB", "DB is old should refresh");
             shouldRefreshData = true;
-        }
-        else{
+        } else {
             leagueData = leagueDao.findByLeagueId(selectedLeague);
             if (leagueData.size() > 0) {
                 shouldRefreshData = false;
-            }
-            else
+            } else
                 shouldRefreshData = true;
         }
-        if(NEVER_UPDATE)
+
+        if (NEVER_UPDATE) //debug variable
             shouldRefreshData = false;
+
+        //begin refresh call or pass leagueData made of database entries
         if (shouldRefreshData) {
             requestLeagueUpdate();
         } else {
@@ -67,14 +62,15 @@ public class LeagueActivity extends ActivityBase {
             recyclerView.setAdapter(adapter);
             recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
         }
+        //setUsageTimerInSharedPrefs(); //Uncomment these if you want to test hitting data limit
+        //showLimitReachedMessage(); //Uncomment these if you want to test hitting data limit
     }
 
     public void requestLeagueUpdate() {
-        //send Volley request to url
-        if(checkAPILimit())
+        if (checkAPILimit()) //always check we are not over limit
             return;
-
         showToast("Updating League Table");
+        //send Volley request to url
         RequestQueue queue = Volley.newRequestQueue(this);
         StringRequest stringRequest = new StringRequest(Request.Method.GET, getLeagueURL(selectedLeague),
                 new Response.Listener<String>() {
@@ -84,17 +80,21 @@ public class LeagueActivity extends ActivityBase {
                         JsonToDataTask jsonToData = new JsonToDataTask();
                         leagueData = jsonToData.getLeagueFromJSON(response);
 
-                        if(leagueData == null || leagueData.isEmpty()) {
+                        if (leagueData == null || leagueData.isEmpty()) {
+                            //we hit limit, set timestamp in prefs and show message
                             setUsageTimerInSharedPrefs();
                             showLimitReachedMessage();
                             return;
                         }
 
+                        //insert league data, db is updated on duplicates based on position
                         leagueDao.insert(leagueData);
 
+                        //writes next refresh time
                         long nextDBRefresh = System.currentTimeMillis();
                         writeSharedPreferencesDBRefresh(nextDBRefresh, "LEAGUE", getSharedPreferencesSelectedLeague());
 
+                        //passes data to recycler view
                         RecyclerView recyclerView = findViewById(R.id.rv_LeagueTable);
                         RecyclerView.Adapter adapter = new LeagueRecyclerViewAdapter(getApplicationContext(), leagueData);
                         recyclerView.setAdapter(adapter);
@@ -123,7 +123,7 @@ public class LeagueActivity extends ActivityBase {
         return "https://v2.api-football.com/leagueTable/" + id;
     }
 
-    private void refreshDB(){
+    private void refreshDB() {
         requestLeagueUpdate();
     }
 

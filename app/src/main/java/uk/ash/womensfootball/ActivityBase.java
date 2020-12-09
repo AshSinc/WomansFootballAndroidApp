@@ -33,24 +33,37 @@ import uk.ash.womensfootball.league.LeagueDatabase;
 
 //acts as a base class for the three Activity tabs
 public class ActivityBase extends AppCompatActivity {
-    protected static boolean NEVER_UPDATE = false;
+
+    //private variables
+    private int activitySelected; //tracks currently selected activity, default to 0
+
+    //protected static variables
+    protected static boolean NEVER_UPDATE = false; //testing var, disables any updates if true
     protected static String TAG = "DebugTag";
-    //custom date/time pattern
-    public static DateTimeFormatter TIME_PATTERN = DateTimeFormatter.ofPattern("d LLL YY 'Kickoff' HH:mm");
     protected static SharedPreferences sharedPreferences;
+
+    //protected variables
     protected LeagueDao leagueDao;
     protected EventDao eventDao;
     protected FixtureDao fixtureDao;
-    private int activitySelected; //tracks currently selected activity, default to 0
+    protected String selectedLeague = "2745"; //tracks currently selected league
+    protected boolean shouldRefreshData = false;
+    protected Long now;
+
+    //public static
+    public static DateTimeFormatter TIME_PATTERN = DateTimeFormatter.ofPattern("d LLL YY 'Kickoff' HH:mm");  //date/time pattern
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        activitySelected = 0;
 
-        // instantiate the sharedPreferences
+        //get sharedPreferences
         sharedPreferences = getSharedPreferences(getString(R.string.shared_pref_file), MODE_PRIVATE);
 
-        activitySelected = 0;
+        //gets stored selectedLeague from shared prefs
+        selectedLeague = getSharedPreferencesSelectedLeague();
+
         // checks savedInstanceState for ACTIVITY number for setting setContentView to correct layout
         if (savedInstanceState != null) {
             activitySelected = savedInstanceState.getInt("ACTIVITY", 0);
@@ -69,16 +82,16 @@ public class ActivityBase extends AppCompatActivity {
             setContentView(R.layout.activity_league);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.tb_Toolbar);
-        //toolbar.setTitle(getString(R.string.res_league)); //change the ActionBarTitle
         setSupportActionBar(toolbar); // Sets the Toolbar to act as the ActionBar for this Activity window.
-        //getSupportActionBar().setTitle(getSharedPreferencesLeagueName());
-        getSupportActionBar().setDisplayShowTitleEnabled(false); //hide the title, possibly use for displaying League Name
+        getSupportActionBar().setTitle(getSharedPreferencesLeagueName()); //change the ActionBarTitle to selectedLeague
+        //getSupportActionBar().setDisplayShowTitleEnabled(false); //hide the title, possibly use for displaying League Name
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabLayout); //get the tab bar
         tabLayout.selectTab(tabLayout.getTabAt(activitySelected), true);  //re-selects the correct tab using the value passed by savedInstanceState
         //adds a new listener to the tabLayout, and passes a new TabSelectedActivitySwitch to control activity switching, have to pass context, this passes the child context if called from child instance
         tabLayout.addOnTabSelectedListener(new ActivityBase.TabSelectedActivitySwitch(this));
 
+        //gets databases and dao's
         synchronized (this) {
             LeagueDatabase leagueDb = LeagueDatabase.getDatabase(this);
             leagueDao = leagueDb.leagueDao();
@@ -87,6 +100,10 @@ public class ActivityBase extends AppCompatActivity {
             EventDatabase eventsDb = EventDatabase.getDatabase(this);
             eventDao = eventsDb.eventDao();
         }
+
+        //used in child activities for checking if should make API call
+        shouldRefreshData = false;
+        now = System.currentTimeMillis()/1000;
     }
 
     //adds dropdown menu to Actionbar
@@ -111,19 +128,19 @@ public class ActivityBase extends AppCompatActivity {
     }
 
     //switches to passed activity, needs Context as its static and called from static listener TabSelectedActivitySwitch
-    //protected static void switchActivityTo(Class activity, Context context) {
     private static void switchActivityTo(Class activity, Context context) {
         Intent intent = new Intent(context, activity); //Intent, the activity we want to switch to
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION); //stops animation on switching activity, stops annoying flicker
-        //intent.putExtra("FROM_ACTIVITY", from); //can pass vars in bundle, useful later?
         context.startActivity(intent); //start activity via context that called it
     }
 
+    //gets the selected league from shared prefs
     protected String getSharedPreferencesSelectedLeague() {
         Log.d(TAG, "getSharedPreferencesSelectedLeague: " + sharedPreferences.getString(getString(R.string.shared_pref_league_id), new String("2745")));
         return sharedPreferences.getString(getString(R.string.shared_pref_league_id), new String("2745"));
     }
 
+    //writes the selected league to shared prefs
     private void writeSharedPreferencesSelectedLeague(String leagueId) { //TODO need to use this
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.remove(getString(R.string.shared_pref_league_id));
@@ -132,6 +149,7 @@ public class ActivityBase extends AppCompatActivity {
         editor.apply();
     }
 
+    //helper method to get the preference id, would be necessary for tracking multiple leagues and their timings
     private int getPreferenceIdFor(String activityName, String id) {
         int prefId = -1;
         if (activityName.matches("LEAGUE")) {
@@ -152,7 +170,8 @@ public class ActivityBase extends AppCompatActivity {
         return prefId;
     }
 
-    protected String getSharedPreferencesLeagueName() {//String leagueId){
+    //gets league name based on leagueid stored in preferences
+    protected String getSharedPreferencesLeagueName() {
         switch (getSharedPreferencesSelectedLeague()) {
             case ("2745"):
                 return getString(R.string.res_FAWSL);
@@ -161,14 +180,16 @@ public class ActivityBase extends AppCompatActivity {
         return getString(R.string.res_FAWSL);
     }
 
-    protected Long getSharedPreferencesLastUpdate(String activityName, String id) {
-        int prefId = getPreferenceIdFor(activityName, id);
+    //gets the next possible update Long timestamp for this leagueid
+    protected Long getSharedPreferencesLastUpdate(String activityName, String leagueId) {
+        int prefId = getPreferenceIdFor(activityName, leagueId);
         return sharedPreferences.getLong(getString(prefId), 0);
     }
 
-    protected void writeSharedPreferencesDBRefresh(long nextUpdate, String activityName, String id) {
-        Log.d(TAG, "writeSharedPreferencesDBRefresh: " + nextUpdate + activityName + id);
-        int prefId = getPreferenceIdFor(activityName, id); //TODO what was i doing in there? Why does that work 0o
+    //writes the next possible update Long timestamp for this leagueid
+    protected void writeSharedPreferencesDBRefresh(long nextUpdate, String activityName, String leagueId) {
+        Log.d(TAG, "writeSharedPreferencesDBRefresh: " + nextUpdate + activityName + leagueId);
+        int prefId = getPreferenceIdFor(activityName, leagueId);
 
         if (prefId == -1) {
             Log.d(TAG, "writeSharedPreferencesDBRefresh: Not saving prefId is -1");
@@ -193,12 +214,11 @@ public class ActivityBase extends AppCompatActivity {
         Log.d(TAG, "App is saving instance bundle");
     }
 
+    //displays dialog and forwards to payment options if API limit reached
     protected void showLimitReachedMessage() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Daily Usage Limit Reached");
         builder.setMessage("Purchase a subscription or try again tomorrow");
-
-        // Set the alert dialog yes button click listener
         builder.setPositiveButton("Payment", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -223,6 +243,7 @@ public class ActivityBase extends AppCompatActivity {
         dialog.show();
     }
 
+    //checks if we are at API limit or if we are past limit before sending more requests
     protected boolean checkAPILimit() {
         Long now = System.currentTimeMillis();
         if (now.compareTo(getUsageTimerInSharedPrefs()) < 0) {
@@ -234,6 +255,7 @@ public class ActivityBase extends AppCompatActivity {
         return false;
     }
 
+    //writes usage timer, used in the above API limit checks
     protected void setUsageTimerInSharedPrefs() {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.remove(getString(R.string.shared_pref_next_usage));
@@ -242,16 +264,16 @@ public class ActivityBase extends AppCompatActivity {
         editor.apply();
     }
 
+    //gets usage timer, used in the above API limit checks
     private long getUsageTimerInSharedPrefs() {
         return sharedPreferences.getLong(getString(R.string.shared_pref_next_usage), 0);
     }
 
+    //prompts user if they are sure they want to wipe database, only wipes based on active activity
     protected void wipeDB() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Clear Database Entries?");
         builder.setMessage("Are you sure?");
-
-        // Set the alert dialog yes button click listener
         builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -272,25 +294,24 @@ public class ActivityBase extends AppCompatActivity {
                 }
             }
         });
-
         builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 showToast("Cancelled data wipe");
             }
         });
-
         AlertDialog dialog = builder.create();
         dialog.show();
     }
 
-
+    //these aren't needed
     @Override
     protected void onResume() {
         super.onResume();
         Log.d(TAG, "App is in onResume");
     }
 
+    //these aren't needed
     @Override
     protected void onPause() {
         super.onPause();
@@ -298,6 +319,7 @@ public class ActivityBase extends AppCompatActivity {
     }
 
     //returns the team icon, needed in all activities
+    //api has broken links to women's team icons, so had to do this manually for every team
     public static Drawable getBadgeForTeam(Context context, int id) {
         Drawable d;
         switch (id) {
@@ -343,10 +365,9 @@ public class ActivityBase extends AppCompatActivity {
         return d;
     }
 
+    //listener to allow tab switching and tracking from other activities
     protected static class TabSelectedActivitySwitch implements TabLayout.OnTabSelectedListener {
-
         private Context context; //have to track context as we are moving through static classes/methods
-
         public TabSelectedActivitySwitch(Context c) {
             context = c;
         }

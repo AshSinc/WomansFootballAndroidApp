@@ -80,7 +80,6 @@ public class FixtureRecyclerViewAdapter extends RecyclerView.Adapter<FixtureRecy
         public void onClick(View view) {
             int pos = getAdapterPosition(); //get clicked item pos
             Log.d("DEBUG", "onClick: " + pos + " is fixtureID - " + data.get(pos).getFixtureId());
-            //fixturesActivity.switchToEvents(data.get(pos).getFixtureId());
             fixturesActivity.switchToEvents(data.get(pos).getFixtureId());
         }
     }

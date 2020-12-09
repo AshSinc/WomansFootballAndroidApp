@@ -14,8 +14,10 @@ import uk.ash.womensfootball.event.EventData;
 import uk.ash.womensfootball.fixture.FixtureData;
 import uk.ash.womensfootball.league.LeagueData;
 
+//converts JSON to data objects
 public class JsonToDataTask {
 
+    //checks for error, API limit reached and request was rejected
     private boolean checkForError(JSONObject jsonObj){
         try {
             if(jsonObj.getJSONObject("api").has("error"))
@@ -26,6 +28,7 @@ public class JsonToDataTask {
         return false;
     }
 
+    //parses League lists from JSON
     public List<LeagueData> getLeagueFromJSON(String jsonString) {
         List<LeagueData> league = new ArrayList<>();
         try {
@@ -61,6 +64,7 @@ public class JsonToDataTask {
         }
     }
 
+    //parses Fixture lists from JSON
     public List<FixtureData> getFixtureFromJSON(String jsonString) {
         List<FixtureData> fixture = new ArrayList<>();
         try {
@@ -118,6 +122,7 @@ public class JsonToDataTask {
         }
     }
 
+    //parses Event lists from JSON
     public List<EventData> getEventFromJSON(String jsonString, int fixtureId, int homeTeamId) {
         List<EventData> events = new ArrayList<>();
         try {
@@ -149,6 +154,7 @@ public class JsonToDataTask {
         }
     }
 
+    //returns set event types and descriptions
     public String[] getTypeAndDescOfEvent(String type, String player, String detail) {
         String[] returnStringArray = new String[2];
         if (type.matches("Goal")) {
@@ -187,7 +193,6 @@ public class JsonToDataTask {
             returnStringArray[0] = "Miss";
             returnStringArray[1] = player + " " + detail;
         }
-
         return returnStringArray;
     }
 }

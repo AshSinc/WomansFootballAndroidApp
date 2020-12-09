@@ -33,7 +33,6 @@ public class FixturesActivity extends ActivityBase {
     private List<FixtureData> fixturesData;
     private List<FixtureData> lastFixtures;
     private List<FixtureData> nextFixtures;
-    private String selectedLeague = "2745";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,27 +50,23 @@ public class FixturesActivity extends ActivityBase {
 
         fixturesData = new ArrayList<>();
 
-        selectedLeague = getSharedPreferencesSelectedLeague();
-
-        boolean shouldRefreshData = false;
-        //check time of last refresh
-        Long now = System.currentTimeMillis()/1000; //system time in seconds
-        Log.d("DEBUGDB", now + " now compareTo() + " + getSharedPreferencesLastUpdate("FIXTURE", selectedLeague));
-        Log.d("DEBUGDB", "" + now.compareTo(getSharedPreferencesLastUpdate("FIXTURE", selectedLeague)));
-
+        //checks if can update based on shared prefs timings activity and leagueId
         if (now.compareTo(getSharedPreferencesLastUpdate("FIXTURE", selectedLeague)) > 0) {
             Log.d("DEBUGDB", "DB is old should refresh");
             shouldRefreshData = true;
         } else {
             fixturesData = fixtureDao.findByLeagueId(selectedLeague);
             if (fixturesData.size() > 0) {
-                Log.d("DEBUGDB", "Found " + fixturesData.get(0));
+                //Log.d("DEBUGDB", "Found " + fixturesData.get(0));
                 shouldRefreshData = false;
             } else
                 shouldRefreshData = true;
         }
-        if(NEVER_UPDATE)
+
+        if(NEVER_UPDATE) //debug variable
             shouldRefreshData = false;
+
+        //begin refresh call or pass fixtureData made of database entries
         if (shouldRefreshData) {
             requestFixtureUpdate();
         } else {
@@ -84,15 +79,17 @@ public class FixturesActivity extends ActivityBase {
     }
 
     public void requestFixtureUpdate() {
-        if(checkAPILimit())
+        if(checkAPILimit()) //always check we are not over limit
             return;
         showToast("Updating Fixtures");
+        //reset to null to check completion of calls
         lastFixtures = null;
         nextFixtures = null;
         fixturesData = new ArrayList<>();
         //send Volley request to url
         RequestQueue queue = Volley.newRequestQueue(this);
         FixturesActivity fa = this; //passing through to recycler view adapter, so we can navigate from Fixture to Event view
+        //call for previous fixtures
         StringRequest stringRequestLast = new StringRequest(Request.Method.GET, getLastFixturesURL(selectedLeague),
                 new Response.Listener<String>() {
                     @Override
@@ -102,34 +99,7 @@ public class FixturesActivity extends ActivityBase {
                         lastFixtures = jsonToData.getFixtureFromJSON(response);
 
                         if(lastFixtures == null || lastFixtures.isEmpty()) {
-                            showLimitReachedMessage();
-                            return;
-                        }
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-
-            }
-        }
-        ) {
-            //have to override getHeaders() method to pass the api key with StringRequest
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> params = new HashMap<String, String>();
-                params.put("x-rapidapi-key", "e5279c018911db9fe82d1a151043cb31");
-                return params;
-            }
-        };
-        StringRequest stringRequestNext = new StringRequest(Request.Method.GET, getNextFixturesURL(selectedLeague),
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        //call getLeagueFromJSON and parse the response to a new league list object
-                        JsonToDataTask jsonToData = new JsonToDataTask();
-                        nextFixtures = jsonToData.getFixtureFromJSON(response);
-
-                        if(nextFixtures == null || nextFixtures.isEmpty()) {
+                            //we hit limit, set timestamp in prefs and show message
                             setUsageTimerInSharedPrefs();
                             showLimitReachedMessage();
                             return;
@@ -150,29 +120,64 @@ public class FixturesActivity extends ActivityBase {
                 return params;
             }
         };
-        // Add the request to the RequestQueue.
+        //call for next fixtures
+        StringRequest stringRequestNext = new StringRequest(Request.Method.GET, getNextFixturesURL(selectedLeague),
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        //call getLeagueFromJSON and parse the response to a new league list object
+                        JsonToDataTask jsonToData = new JsonToDataTask();
+                        nextFixtures = jsonToData.getFixtureFromJSON(response);
+
+                        if(nextFixtures == null || nextFixtures.isEmpty()) {
+                            //we hit limit, set timestamp in prefs and show message
+                            setUsageTimerInSharedPrefs();
+                            showLimitReachedMessage();
+                            return;
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        }
+        ) {
+            //have to override getHeaders() method to pass the api key with StringRequest
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("x-rapidapi-key", "e5279c018911db9fe82d1a151043cb31");
+                return params;
+            }
+        };
+        //queues the request finish listener
         queue.addRequestFinishedListener(new RequestQueue.RequestFinishedListener<Object>() {
             @Override
             public void onRequestFinished(Request<Object> request) {
+                //makes sure both calls finished before proceeding
                 if(nextFixtures != null && lastFixtures != null){
                     Log.d("DEBUGDB", "onRequestFinished: both not null");
 
                     lastFixtures.sort(new SortByTime());
                     nextFixtures.sort(new SortByTime());
-                    // set next fixture refresh for 100 minutes after the start of the next game
-                    //not ideal but workaround for API restrictions for now
+
                     long nextFixtureRefresh = System.currentTimeMillis()+86400000; //set default to a day later, would only be used at end of season if there are no upcoming games
                     if(!nextFixtures.isEmpty())
-                        nextFixtureRefresh = Converters.longFromLdt(nextFixtures.get(0).getDateTime().plusMinutes(100));
+                        nextFixtureRefresh = Converters.longFromLdt(nextFixtures.get(0).getDateTime().plusMinutes(100)); //set next fixture refresh for 100 minutes after the start of the next game
 
                     Log.d("DEBUGDB", "Next Expected end of game: " + nextFixtureRefresh);
 
+                    //combine fixtures
                     fixturesData.addAll(lastFixtures);
                     fixturesData.addAll(nextFixtures);
 
+                    //clear table
                     fixtureDao.clearTable();
+                    //insert new data
                     fixtureDao.insert(fixturesData);
 
+                    //write next fixture refresh to DB
                     writeSharedPreferencesDBRefresh(nextFixtureRefresh, "FIXTURE", getSharedPreferencesSelectedLeague());
 
                     //construct and add recyclerView data
@@ -188,6 +193,7 @@ public class FixturesActivity extends ActivityBase {
             }
         });
 
+        //submits requests
         queue.add(stringRequestLast);
         queue.add(stringRequestNext);
     }
@@ -200,13 +206,14 @@ public class FixturesActivity extends ActivityBase {
         return "https://v2.api-football.com/fixtures/league/" + id + "/next/20?timezone=Europe/London";
     }
 
-    //public void switchToEvents(int fixtureId) {
     public void switchToEvents(int fixtureId) {
         Intent intent = new Intent(this, EventsActivity.class); //Intent, the activity we want to switch to
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION); //stops animation on switching activity, stops annoying flicker
         intent.putExtra("FIXTURE_ID", fixtureId);
         startActivity(intent); //start activity via context that called it
     }
+
+    //sort comparator so we can sort by time of kickoff
     public class SortByTime implements Comparator<FixtureData>
     {
         @Override

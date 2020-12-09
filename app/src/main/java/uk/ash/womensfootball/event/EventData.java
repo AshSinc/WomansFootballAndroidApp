@@ -9,10 +9,10 @@ import androidx.room.PrimaryKey;
 public class EventData {
 
     @NonNull
-    @PrimaryKey(autoGenerate = true) //TODO check this isn't generating duplicate entries in DB
+    @PrimaryKey(autoGenerate = true)
     public int id;
 
-    public String eventType; //
+    public String eventType; //stores type of event for setting relevant icons
 
     private int fixtureId; //fixture id from Fixtures API
 
