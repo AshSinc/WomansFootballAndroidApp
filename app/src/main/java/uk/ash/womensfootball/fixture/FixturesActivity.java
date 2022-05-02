@@ -147,7 +147,7 @@ public class FixturesActivity extends ActivityBase {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 Map<String, String> params = new HashMap<String, String>();
-                params.put("x-rapidapi-key", "e5279c018911db9fe82d1a151043cb31");
+                params.put("x-rapidapi-key", "api key here, should use enviroment variables"); //old key invalid anyway, but for clarity
                 return params;
             }
         };
